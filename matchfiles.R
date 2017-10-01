@@ -27,7 +27,6 @@ for (j in 1:length(namesacc)) {
   cnt = cnt + 1
 }
 
-
 # find the pairs based on id and date....
 compacc = comp[comp$method=="acc",]
 comppsg = comp[comp$method=="psg",]
@@ -39,23 +38,21 @@ psgR$time.psg = as.numeric(as.POSIXlt(psgR$time.x))
 psgR$time.accR = as.numeric(as.POSIXlt(psgR$time.y))
 diffR = (psgR$time.accR - psgR$time.psg) / 3600
 
-
 psgL = merge(comppsg,compaccL,by="id")
 psgL$time.psg = as.numeric(as.POSIXlt(psgL$time.x))
 psgL$time.accL = as.numeric(as.POSIXlt(psgL$time.y))
 diffL = (psgL$time.accL - psgL$time.psg) / 3600
 
-
-
 # verify by looking at signal...
 # psgdata = psgR
 psgdata = psgL
 output = data.frame(id=rep(0,nrow(psgdata)))
-output$row = output$perc_sleep_intimeinbed = output$error_waketime_min = output$error_onset = output$error_wakeup = 0
-output$perc1 = output$perc2 = output$perc3 = output$perc4 = 0
+output$perc_psg_eq_accinbed =  output$error_waketime_min  = 0
+#output$row = output$error_onset = output$error_wakeup = 0 
+# output$perc1 = output$perc2 = output$perc3 = output$perc4 = 0
 
-
-for (h in 1:6) { # c(6,7,9,10,20,21,22,26)){ #1:nrow(psgdata)
+pdf(file=paste0("/media/windows-share/Exeter/psg.pdf"),width = 7,height = 7)
+for (h in 1:nrow(psgdata)) { # c(6,7,9,10,20,21,22,26)){ #1:nrow(psgdata)
   # print(h)
   id = as.numeric(unlist(strsplit(unlist(strsplit(psgdata$fname.x[h],"pant"))[2],".cs"))[1])
   PSG = read.csv(psgdata$fname.x[h])
@@ -130,18 +127,18 @@ for (h in 1:6) { # c(6,7,9,10,20,21,22,26)){ #1:nrow(psgdata)
 
   show = blocksize:(nrow(psgacc)-blocksize+1)
   # x11()
-  jpeg(file=paste0("/media/windows-share/Exeter/examplepsg_",h,".jpeg"),width = 7,height = 7,res=400,un="in")
+  # jpeg(file=paste0("/media/windows-share/Exeter/examplepsg_",h,".jpeg"),width = 7,height = 7,res=400,un="in")
   par(mfrow=c(3,1),mar=c(2,4,4,3))
-  plot(psgacc$time[show],psgacc$stagescore[show],pch=20,ylim=c(-0.5,4.5),type="l",main="sleep stages",bty="l",axes=FALSE,xlab="",ylab="")
+  plot(psgacc$time[show],psgacc$stagescore[show],pch=20,ylim=c(-0.5,4.5),type="l",main=paste0("sleep stages, id ",id),bty="l",axes=FALSE,xlab="",ylab="")
   axis(side = 2,at = 0:4,labels = c("W","R","N1","N2","N3"),tick = TRUE)
   # axis(side = 2,at = 0:4,labels = c("W","R","N1","N2","N3"),tick = TRUE)
-  # lines(psgacc$time[c(timeinbed$lightsout,timeinbed$lightson)],rep(0.5,2),col="blue",lwd=3)
+  lines(psgacc$time[c(timeinbed$lightsout,timeinbed$lightson)],rep(0.5,2),col="blue",lwd=3)
   plot(psgacc$time[show],psgacc$ENMO[show],ylim=c(0,0.2),type="l",main="magnitude of acceleration (gravitational acceleration)",bty="l",axes=FALSE,ylab="")
   axis(side = 2,at = c(0,0.1),labels = c("0","0.1"),tick = TRUE)
-  # lines(psgacc$time[c(timeinbed$lightsout,timeinbed$lightson)],rep(0.01,2),col="blue",lwd=3)
+  lines(psgacc$time[c(timeinbed$lightsout,timeinbed$lightson)],rep(0.01,2),col="blue",lwd=3)
   plot(psgacc$time[show],psgacc$anglez[show],pch=20,ylim=c(-90,90),type="l", main = "angle-z (degrees)",bty="l",ylab="")
-  # lines(psgacc$time[c(timeinbed$lightsout,timeinbed$lightson)],rep(50,2),col="blue",lwd=3)
-  dev.off()
+  lines(psgacc$time[c(timeinbed$lightsout,timeinbed$lightson)],rep(50,2),col="blue",lwd=3)
+  # dev.off()
   # Percentage of sleep stage time that was correctly classified as time in bed
   psgacc$timeinbed = 0
   psgacc$timeinbed[timeinbed$lightsout:timeinbed$lightson] = 1
@@ -151,25 +148,51 @@ for (h in 1:6) { # c(6,7,9,10,20,21,22,26)){ #1:nrow(psgdata)
   # plot for visual check
   totalsleepstage = length(which(psgacc$stagescore > 0))
   # percentage of sleep periods that falls within the time in bed
-  perc_sleep_intimeinbed = round(((totalsleepstage - length(which(psgacc$timeinbed == 0 & psgacc$stagescore > 0))) / totalsleepstage) * 100,digits=2)
+  ignoreN1 = which(psgacc$stagescore != 2)
+  perc_psg_eq_accinbed = round(((totalsleepstage - length(which(psgacc$timeinbed[ignoreN1] == 0 & psgacc$stagescore[ignoreN1] > 0))) / totalsleepstage) * 100,digits=2)
   
-  perc_stage = function(x,stage) {
-    Tstage = length(which(x$stagescore == stage))
-    perc_stage = round(((Tstage - length(which(x$timeinbed == 0 & x$stagescore == stage))) / Tstage) * 100,digits=2)
-    return(perc_stage)
+  output$perc_psg_eq_accinbed[h] = perc_psg_eq_accinbed
+  
+  #===================================
+  # nega_predic_value based on 30 minute data blocks
+  # psg
+  tmp0 = psgacc$stagescore
+  N1 = which(tmp0 == 2) # N1 is counted as awake:
+  if (length(N1) > 0) tmp0[N1] = 0
+  higherstages = which(tmp0 >= 1) 
+  if (length(higherstages) > 0) tmp0[higherstages] = 1
+  tmp1 = cumsum(c(0,tmp0))
+  stagescore_downsampled = diff(tmp1[seq(1,length(tmp1),by=12*30)]) / (12*30)
+  # acc
+  tmp3 = cumsum(c(0,psgacc$timeinbed))
+  timeinbeddownsampled = diff(tmp3[seq(1,length(tmp3),by=12*30)]) / (12*30)
+  coverage = 0.1
+  output$Nblocks_outofbed[h] = length(which(timeinbeddownsampled < coverage))
+  min_Nblocks_outofbed= 1
+  if (length(which(timeinbeddownsampled < coverage)) >= min_Nblocks_outofbed) {
+    
+    A1 = length(which(timeinbeddownsampled < coverage & stagescore_downsampled < coverage)  )
+    B1 = length(which(timeinbeddownsampled < coverage))
+    ratio = A1 / B1
+    print(paste0(A1," ",B1," ",ratio," ",output$Nblocks_outofbed[h]))
+    output$nega_predic_value[h] = ratio * 100
+    # if (ratio == 0) kjkkk
+  } else {
+    output$nega_predic_value[h] = NA
   }
-  perc1 = perc_stage(psgacc,stage=1)
-  perc2 = perc_stage(psgacc,stage=2)
-  perc3 = perc_stage(psgacc,stage=3)
-  perc4 = perc_stage(psgacc,stage=4)
-  output$perc1[h] = perc1
-  output$perc2[h] = perc2
-  output$perc3[h] = perc3
-  output$perc4[h] = perc4
-  
-  
-  output$perc_sleep_intimeinbed[h] = perc_sleep_intimeinbed
-  
+  #===================================
+  # sensitivity based on 30 minute data blocks
+  tmp0 = psgacc$stagescore
+  higherstages = which(tmp0 >= 1) # now N1 is counted as sleep
+  if (length(higherstages) > 0) tmp0[higherstages] = 1
+  tmp1 = cumsum(c(0,tmp0))
+  stagescore_downsampled = diff(tmp1[seq(1,length(tmp1),by=12*30)]) / (12*30)
+  if (length(which(timeinbeddownsampled > (1-coverage))) >= min_Nblocks_outofbed) {
+    ratio = length(which(timeinbeddownsampled > (1-coverage) & stagescore_downsampled > (1-coverage))  ) / length(which(stagescore_downsampled > (1-coverage)))
+    output$sensitivity[h] = ratio * 100
+  } else {
+    output$sensitivity[h] = NA
+  }
   
   # Time (minutes) in sleep during the timewindow classified as not in bed
   allsleep = which(psgacc$stagescore >0 & psgacc$timeinbed == 1)
@@ -180,24 +203,11 @@ for (h in 1:6) { # c(6,7,9,10,20,21,22,26)){ #1:nrow(psgdata)
   error_waketime_min = round(length(which((data$algo == 0 & data$stagescore > 0))) / 12,digits=2)
   output$error_waketime_min[h] = error_waketime_min
   
-  # onset and wakingup 'error'
-  timewindowacc = range(which(psgacc$timeinbed == 1))
-  onsetacc = timewindowacc[1]
-  wakeupacc = timewindowacc[2]
-  timewindowpsg = range(which(psgacc$stagescore > 0))
-  onsetpsg = timewindowpsg[1]
-  wakeuppsg = timewindowpsg[2]
-  error_onset = (onsetacc - onsetpsg) / 12
-  error_wakeup = (wakeupacc - wakeuppsg) / 12
-  output$error_onset[h] = error_onset
-  output$error_wakeup[h] =  error_wakeup
-    output$id[h] = id
-  output$row[h] = h
-  # print(output[h,])
-  # print performance
-  # print(paste0("row: ",h," id: ",id," ",perc_sleep_intimeinbed," ",error_waketime_min))
+  output$id[h] = id
+
 }
+dev.off()
 
 print("--------------------------")
-print(output[order(output$perc_sleep_intimeinbed,decreasing = TRUE),])
+print(output[order(output$perc_psg_eq_accinbed,decreasing = TRUE),])
 # print(output)

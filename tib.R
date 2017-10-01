@@ -10,7 +10,8 @@ inbed = function(angle, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 3
   inbedtime = rep(NA,length(x))
   pp = quantile(x,probs=c(perc)) * inbedthreshold 
   # if (pp == 0) pp = 7
-  if (pp < 0.5) pp = 0.5 # needed because dummy data is inserted
+  if (pp < 0.13) pp = 0.13 # needed because dummy data is inserted
+  if (pp > 0.50) pp = 0.50 # needed because dummy data is inserted
   # print(quantile(x))
   # print(paste0(id," ",round(pp,digits=2)," ",mean(x,digits=3)))
   nomov[which(x < pp)] = 1
