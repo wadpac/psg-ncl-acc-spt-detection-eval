@@ -12,11 +12,8 @@ inbed = function(angle, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 3
   # if (pp == 0) pp = 7
   if (pp < 0.13) pp = 0.13 # needed because dummy data is inserted
   if (pp > 0.50) pp = 0.50 # needed because dummy data is inserted
-  # print(quantile(x))
-  # print(paste0(id," ",round(pp,digits=2)," ",mean(x,digits=3)))
   nomov[which(x < pp)] = 1
   nomov = c(0,nomov,0)
-  # x11();plot(nomov,type="p",pch=20)
   s1 = which(diff(nomov) == 1) #start of blocks in bed
   e1 = which(diff(nomov) == -1) #end of blocks in bed
   bedblock = which((e1 - s1) > ((60/ws3)*bedblocksize*1)) #which are the blocks longer than bedblocksize in minutes?
@@ -26,7 +23,6 @@ inbed = function(angle, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 3
     for (j in 1:length(s2)){
       inbedtime[ s2[j]:e2[j]] = 1 #record these blocks in the inbedtime vector
     }
-    # lines(inbedtime,type="p",col="red")
     # fill up gaps in time between bed blocks
     outofbed = rep(0,length(inbedtime))
     outofbed[which(is.na(inbedtime) == TRUE)] = 1
@@ -44,7 +40,6 @@ inbed = function(angle, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 3
       }
     }
     if (length(inbedtime) == (length(x)+1)) inbedtime = inbedtime[1:(length(inbedtime)-1)]
-    
     # keep indices for longest in bed block:
     inbedtime2 = rep(1,length(inbedtime))
     inbedtime2[which(is.na(inbedtime) == TRUE)] = 0
@@ -57,6 +52,8 @@ inbed = function(angle, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 3
   } else {
     lightson = c()
     lightsout = c()
+    tib.threshold = c()
   }
-  invisible(list(lightsout=lightsout,lightson=lightson))
+  tib.threshold = pp
+  invisible(list(lightsout=lightsout,lightson=lightson,tib.threshold=tib.threshold))
 }
