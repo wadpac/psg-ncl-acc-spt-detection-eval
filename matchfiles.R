@@ -44,14 +44,14 @@ psgL$time.accL = as.numeric(as.POSIXlt(psgL$time.y))
 diffL = (psgL$time.accL - psgL$time.psg) / 3600
 
 # verify by looking at signal...
-psgdata = psgR
-# psgdata = psgL
+# psgdata = psgR
+psgdata = psgL
 output = data.frame(id=rep(0,nrow(psgdata)))
-output$perc_psg_eq_accinbed = output$tib.threshold =  output$error_waketime_min  = 0
+output$Sens1 = 0 #output$tib.threshold =  0
 #output$row = output$error_onset = output$error_wakeup = 0 
 # output$perc1 = output$perc2 = output$perc3 = output$perc4 = 0
 
-pdf(file=paste0("/media/windows-share/Exeter/psg_right.pdf"),width = 7,height = 3.5)
+pdf(file=paste0("/media/windows-share/Exeter/psg_left.pdf"),width = 7,height = 3.5)
 for (h in 1:nrow(psgdata)) { # c(6,7,9,10,20,21,22,26)){ #1:nrow(psgdata)
   # print(h)
   id = as.numeric(unlist(strsplit(unlist(strsplit(psgdata$fname.x[h],"pant"))[2],".cs"))[1])
@@ -124,8 +124,8 @@ for (h in 1:nrow(psgdata)) { # c(6,7,9,10,20,21,22,26)){ #1:nrow(psgdata)
   psgacc = rbind(psgacc,psgacc_expand)
 
   timeinbed = inbed(psgacc$anglez, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 30, outofbedsize = 60, ws3 = 5)
-  output$tib.threshold[h] = timeinbed$tib.threshold
   
+  #===================================================================
   # plot for visual check
   show = blocksize:(nrow(psgacc)-blocksize+1)
   # x11()
@@ -134,87 +134,86 @@ for (h in 1:nrow(psgdata)) { # c(6,7,9,10,20,21,22,26)){ #1:nrow(psgdata)
   CA = 0.8
   plot(psgacc$time[show],psgacc$stagescore[show],pch=20,ylim=c(-0.5,4.5),type="l",main="",bty="l",axes=FALSE,xlab="",ylab="psg sleep stage", cex.lab = CL)
   axis(side = 2,at = 0:4,labels = c("Wake","REM","N1","N2","N3"),tick = TRUE,cex.axis=0.6,las=1)
-  text(x = psgacc$time[show][2],y=1,labels = paste0(id),cex = 0.05,pos = 3)
+  text(x = psgacc$time[show][2],y=1,labels = paste0(id),cex = 2,pos = 3,col="green")
   timeinbedt0t1 = c(timeinbed$lightsout,timeinbed$lightson)
   plot(psgacc$time[show],psgacc$anglez[show],pch=20,ylim=c(-90,90),type="l", main = "",bty="l",ylab="angle (degrees)",xlab="Time",cex.lab=CL,cex.axis=CA)
   if (length(timeinbedt0t1) == 2) lines(psgacc$time[timeinbedt0t1],rep(89,2),col="gray",lwd=3,lty=1,lend=2)
   
-  
-  # Percentage of sleep stage time that was correctly classified as time in bed
   psgacc$timeinbed = 0
   if (length(timeinbedt0t1) == 2) psgacc$timeinbed[timeinbed$lightsout:timeinbed$lightson] = 1
   psgacc = psgacc[(blocksize+1):(nrow(psgacc)-blocksize),] # remove blocks of dummy data
   
-  totalsleepstage = length(which(psgacc$stagescore > 0))
-  # percentage of sleep periods that falls within the time in bed
-  ignoreN1 = which(psgacc$stagescore != 2)
-  perc_psg_eq_accinbed = round(((totalsleepstage - length(which(psgacc$timeinbed[ignoreN1] == 0 & psgacc$stagescore[ignoreN1] > 0))) / totalsleepstage) * 100,digits=2)
+  #=================================================
+  # Define sleep and wake
+  definesleep = c(1,2,3,4) # option to redefine which PSG labels are counted towards sleep
+  definewake = c(0) # option to redefine which PSG labels are counted towards wake
   
-  output$perc_psg_eq_accinbed[h] = perc_psg_eq_accinbed
+  #=====================================================
+  # Sens 1: Percentage of sleep stage time that was correctly classified as time in bed
+  totalsleepstage = length(which(psgacc$stagescore %in% definesleep == TRUE))
+  perc_psg_eq_accinbed = round(((totalsleepstage -
+                                   length(which(psgacc$timeinbed == 0 &
+                                                                  psgacc$stagescore %in% definesleep ==TRUE)))
+                                / totalsleepstage) * 100,digits=2)
+  output$Sens1[h] = perc_psg_eq_accinbed
+  # Negative predictive value
+  totaloutofbed = length(which(psgacc$timeinbed == 0))
   
-  #===================================
-  # nega_predic_value based on 30 minute data blocks
-  # psg
-  tmp0 = psgacc$stagescore
-  N1 = which(tmp0 == 2) # N1 is counted as awake:
-  if (length(N1) > 0) tmp0[N1] = 0
-  higherstages = which(tmp0 >= 1) 
-  if (length(higherstages) > 0) tmp0[higherstages] = 1
-  tmp1 = cumsum(c(0,tmp0))
-  senspecblocksize = 30
-  stagescore_downsampled = diff(tmp1[seq(1,length(tmp1),by=12*senspecblocksize)]) / (12*senspecblocksize)
-  # acc
-  tmp3 = cumsum(c(0,psgacc$timeinbed))
-  timeinbeddownsampled = diff(tmp3[seq(1,length(tmp3),by=12*senspecblocksize)]) / (12*senspecblocksize)
-  coverage = 0.1
-  
-  output$Nblocks_outofbed[h] = length(which(timeinbeddownsampled < coverage))
-  min_Nblocks_outofbed= 1
-  if (length(which(timeinbeddownsampled < coverage)) >= min_Nblocks_outofbed) {
-    
-    A1 = length(which(timeinbeddownsampled < coverage & stagescore_downsampled < coverage)  )
-    B1 = length(which(timeinbeddownsampled < coverage))
-    ratio = A1 / B1
-    # print(paste0(A1," ",B1," ",ratio," ",output$Nblocks_outofbed[h]))
-    output$nega_predic_value[h] = ratio * 100
-    # if (ratio == 0) kjkkk
+  if (totaloutofbed > (12*60)) {
+    output$NPV[h] = round(((totaloutofbed -
+                               length(which(psgacc$timeinbed == 0 &
+                                              psgacc$stagescore %in% definesleep ==TRUE)))
+                            / totaloutofbed) * 100,digits=2)
   } else {
-    output$nega_predic_value[h] = NA
+    output$NPV[h] = NA
   }
-  #===================================
-  # sensitivity based on 30 minute data blocks
-  tmp0 = psgacc$stagescore
-  higherstages = which(tmp0 >= 1) # now N1 is counted as sleep
-  if (length(higherstages) > 0) tmp0[higherstages] = 1
-  tmp1 = cumsum(c(0,tmp0))
-  stagescore_downsampled = diff(tmp1[seq(1,length(tmp1),by=12*senspecblocksize)]) / (12*senspecblocksize)
-  if (length(which(timeinbeddownsampled > (1-coverage))) >= min_Nblocks_outofbed) {
-    ratio = length(which(timeinbeddownsampled > (1-coverage) & stagescore_downsampled > (1-coverage))  ) / length(which(stagescore_downsampled > (1-coverage)))
-    output$sensitivity[h] = ratio * 100
-  } else {
-    output$sensitivity[h] = NA
-  }
-  
-  # Time (minutes) in sleep during the timewindow classified as not in bed
-  # allsleep = which(psgacc$stagescore >0 & psgacc$timeinbed == 1)
-  # onset = allsleep[1]
-  # wakeup = allsleep[length(allsleep)]
-  # sleepperiod = onset:wakeup
-  # data = data.frame(algo = psgacc$timeinbed[-sleepperiod],stagescore = psgacc$stagescore[-sleepperiod])
-  # error_waketime_min = round(length(which((data$algo == 0 & data$stagescore > 0))) / 12,digits=2)
-  # output$error_waketime_min[h] = error_waketime_min
-  
+  output$totaloutofbed[h] = totaloutofbed/12 # in minutes
+  # #===================================
+  # # Prepare for calculation of NPV and Sens2
+  # tmp0 = psgacc$stagescore
+  # notwakeorsleepi = which(tmp0 %in% definewake == FALSE & tmp0 %in% definesleep == FALSE)
+  # if (length(notwakeorsleepi) > 0) tmp0[notwakeorsleepi] = 0.5
+  # wakei = which(tmp0 %in% definewake ==TRUE)
+  # if (length(wakei) > 0) tmp0[wakei] = 0
+  # sleepi = which(tmp0 %in% definesleep) 
+  # if (length(sleepi) > 0) tmp0[sleepi] = 1
+  # tmp1 = cumsum(c(0,tmp0))
+  # SBS = 60 # minutes of block size to downsample to
+  # stagescore_downsampled = diff(tmp1[seq(1,length(tmp1),by=12*SBS)]) / (12*SBS)
+  # tmp3 = cumsum(c(0,psgacc$timeinbed))
+  # timeinbeddownsampled = diff(tmp3[seq(1,length(tmp3),by=12*SBS)]) / (12*SBS)
+  # coverage = 0.2
+  # output$Nblocks_outofbed[h] = length(which(timeinbeddownsampled < coverage))
+  # min_Nblocks_outofbed= 1
+  # #===================================
+  # # nega_predic_value based on 30 minute data blocks
+  # if (length(which(timeinbeddownsampled < coverage)) >= min_Nblocks_outofbed) {
+  #   A1 = length(which(timeinbeddownsampled < coverage & stagescore_downsampled < coverage)  )
+  #   B1 = length(which(timeinbeddownsampled < coverage))
+  #   ratio = A1 / B1
+  #   output$nega_predic_value[h] = ratio * 100
+  # } else {
+  #   output$nega_predic_value[h] = NA
+  # }
+  # #===================================
+  # # Sens 2: sensitivity based on 30 minute data blocks
+  # if (length(which(timeinbeddownsampled > (1-coverage))) >= min_Nblocks_outofbed) {
+  #   ratio = length(which(timeinbeddownsampled > (1-coverage) & stagescore_downsampled > (1-coverage))  ) / length(which(stagescore_downsampled > (1-coverage)))
+  #   output$Sens2[h] = ratio * 100
+  # } else {
+  #   output$Sens2[h] = NA
+  # }
   output$id[h] = id
-
+  output$tib.threshold[h] = round(timeinbed$tib.threshold,digits=2)
 }
 dev.off()
 
-
-npv = output$nega_predic_value[which(is.na(output$nega_predic_value) == FALSE)]
-sen1 = output$sensitivity[which(is.na(output$sensitivity) == FALSE)]
-npv_nb = output$Nblocks_outofbed[which(is.na(output$nega_predic_value) == FALSE)]
-sen1_nb = output$Nblocks_outofbed[which(is.na(output$sensitivity) == FALSE)]
+# prepare some variables for manual investigation
+npv = output$NP[which(is.na(output$NPV) == FALSE)]
+sen1 = output$Sens1[which(is.na(output$Sens1) == FALSE)]
+# npv_nb = output$Nblocks_outofbed[which(is.na(output$nega_predic_value) == FALSE)]
+sen1_nb = output$Nblocks_outofbed[which(is.na(output$Sens1) == FALSE)]
 
 print("--------------------------")
-print(output[order(output$perc_psg_eq_accinbed,decreasing = TRUE),])
+print(output[order(output$Sens1,decreasing = TRUE),])
 # print(output)
