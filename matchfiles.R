@@ -1,8 +1,8 @@
 rm(list=ls())
 graphics.off()
 
-pathpsg = "/media/windows-share/Exeter/psg_study/cleaned_psg"
-pathacc = "/media/windows-share/Exeter/psg_study/cleaned_acc"
+pathpsg = "/media/vincent/Exeter/psg_study/cleaned_psg"
+pathacc = "/media/vincent/Exeter/psg_study/cleaned_acc"
 source("~/GGIR/psg-newcastle/tib.R")
 
 namespsg = dir(pathpsg, full.names = TRUE)
@@ -44,14 +44,14 @@ psgL$time.accL = as.numeric(as.POSIXlt(psgL$time.y))
 diffL = (psgL$time.accL - psgL$time.psg) / 3600
 
 # verify by looking at signal...
-# psgdata = psgR
-psgdata = psgL
+psgdata = psgR
+# psgdata = psgL
 output = data.frame(id=rep(0,nrow(psgdata)))
 output$Sens1 = 0 #output$tib.threshold =  0
 #output$row = output$error_onset = output$error_wakeup = 0 
 # output$perc1 = output$perc2 = output$perc3 = output$perc4 = 0
 
-pdf(file=paste0("/media/windows-share/Exeter/psg_left.pdf"),width = 7,height = 3.5)
+pdf(file=paste0("/media/vincent/Exeter/psg_left.pdf"),width = 7,height = 3.5)
 for (h in 1:nrow(psgdata)) { # c(6,7,9,10,20,21,22,26)){ #1:nrow(psgdata)
   # print(h)
   id = as.numeric(unlist(strsplit(unlist(strsplit(psgdata$fname.x[h],"pant"))[2],".cs"))[1])
@@ -103,9 +103,9 @@ for (h in 1:nrow(psgdata)) { # c(6,7,9,10,20,21,22,26)){ #1:nrow(psgdata)
   psgacc = psgacc[(radi+1):(t2-radi),]
   psgacc$time = newtime
   psgacc = merge(PSG,ACC,by="timenum")
-
+  
   # apply timeinbed detection and compare
-    
+  
   # first expand data with dummy data to create realistic conditions
   blocksize = 12 * 60 * 1.5
   angleblock = rnorm(n = blocksize,mean = 0,sd = 10) + sin((1:blocksize)/pi*0.1) * 40
@@ -115,16 +115,26 @@ for (h in 1:nrow(psgdata)) { # c(6,7,9,10,20,21,22,26)){ #1:nrow(psgdata)
   psgacc_expand$time = as.POSIXlt(psgacc_expand$timenum,origin="1970-1-1",tz = "Europe/London")
   psgacc_expand$stagescore = 0
   psgacc_expand$ENMO = 0.1
-
+  
   psgacc = rbind(psgacc_expand,psgacc)
   psgacc_expand$timenum = seq(psgacc$timenum[nrow(psgacc)]+5,psgacc$timenum[nrow(psgacc)]+(5*blocksize),by=5)
   psgacc_expand$time = as.POSIXlt(psgacc_expand$timenum,origin="1970-1-1",tz = "Europe/London")
   psgacc_expand$stagescore = 0
   psgacc_expand$ENMO = 0.1
   psgacc = rbind(psgacc,psgacc_expand)
-
+  
   timeinbed = inbed(psgacc$anglez, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 30, outofbedsize = 60, ws3 = 5)
   
+  # Derive sleep efficiency
+  
+  if (length(timeinbed$lightson) != 0 & length(timeinbed$lightsout) != 0) {
+    sleepclas = timeinbed$sleep[timeinbed$lightsout:timeinbed$lightson,1]
+    output$est_sle_eff[h] = (length(which(sleepclas == 1)) / length(sleepclas)) * 100
+    
+    pss = psgacc$stagescore
+    sleepscore = pss[which(pss != 0)[1]:length(pss)-match(0,rev(pss))+1]
+    output$true_sle_eff[h] = (length(which(sleepscore != 0)) / length(sleepscore)) * 100
+  }
   #===================================================================
   # plot for visual check
   show = blocksize:(nrow(psgacc)-blocksize+1)
@@ -153,7 +163,7 @@ for (h in 1:nrow(psgdata)) { # c(6,7,9,10,20,21,22,26)){ #1:nrow(psgdata)
   totalsleepstage = length(which(psgacc$stagescore %in% definesleep == TRUE))
   perc_psg_eq_accinbed = round(((totalsleepstage -
                                    length(which(psgacc$timeinbed == 0 &
-                                                                  psgacc$stagescore %in% definesleep ==TRUE)))
+                                                  psgacc$stagescore %in% definesleep ==TRUE)))
                                 / totalsleepstage) * 100,digits=2)
   output$Sens1[h] = perc_psg_eq_accinbed
   # Negative predictive value
@@ -161,9 +171,9 @@ for (h in 1:nrow(psgdata)) { # c(6,7,9,10,20,21,22,26)){ #1:nrow(psgdata)
   
   if (totaloutofbed > (12*60)) {
     output$NPV[h] = round(((totaloutofbed -
-                               length(which(psgacc$timeinbed == 0 &
-                                              psgacc$stagescore %in% definesleep ==TRUE)))
-                            / totaloutofbed) * 100,digits=2)
+                              length(which(psgacc$timeinbed == 0 &
+                                             psgacc$stagescore %in% definesleep ==TRUE)))
+                           / totaloutofbed) * 100,digits=2)
   } else {
     output$NPV[h] = NA
   }
@@ -217,3 +227,17 @@ sen1_nb = output$Nblocks_outofbed[which(is.na(output$Sens1) == FALSE)]
 print("--------------------------")
 print(output[order(output$Sens1,decreasing = TRUE),])
 # print(output)
+
+
+x11()
+plot(output$true_sle_eff,output$est_sle_eff,xlab="Sleep efficiency by PSG (%)",
+     ylab="Estimated sleep efficiency (%)",
+     ylim=c(0,100),xlim=c(0,100),pch=20,bty="l")
+abline(a=c(0,1))
+
+
+x11()
+plot(output$Sens1,output$true_sle_eff,xlab="Sensitivity (%)",
+     ylab="Sleep efficiency (%)",
+     ylim=c(0,100),xlim=c(0,100),pch=20,bty="l")
+abline(a=c(0,1))

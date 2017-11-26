@@ -54,6 +54,38 @@ inbed = function(angle, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 3
     lightsout = c()
     tib.threshold = c()
   }
+  #
+  # Sleep detection:
+  angle[which(is.na(angle) == T)] = 0
+  cnt = 1
+  sdl1 = rep(0,length(angle)) # time => angle
+  ws3 = 5
+  timethreshold = 5
+  anglethreshold = 5
+  postch = which(abs(diff(angle)) > anglethreshold) #posture change of at least j degrees
+  # count posture changes that happen less than once per ten minutes
+  q1 = c()
+  if (length(postch) > 1) {
+    
+    q1 = which(diff(postch) > (timethreshold*(60/ws3))) #less than once per i minutes
+  }
+  if (length(q1) > 0) {
+    for (gi in 1:length(q1)) {
+      sdl1[postch[q1[gi]]:postch[q1[gi]+1]] = 1 #periods with no posture change
+    }
+  } else { #possibly a day without wearing
+    if (length(postch) < 10) {  #possibly a day without wearing
+      sdl1[1:length(sdl1)] = 1 #periods with no posture change
+    } else {  #possibly a day with constantly posture changes
+      sdl1[1:length(sdl1)] = 0 #periodsposture change
+    }
+  }
+  sleep = sdl1
+  sleep = as.data.frame(sleep)
+    
+  
+  
+  #
   tib.threshold = pp
-  invisible(list(lightsout=lightsout,lightson=lightson,tib.threshold=tib.threshold))
+  invisible(list(lightsout=lightsout,lightson=lightson,tib.threshold=tib.threshold, sleep=sleep))
 }
