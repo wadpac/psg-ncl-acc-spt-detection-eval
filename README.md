@@ -1,5 +1,5 @@
 # Code related to the analyses of psg and accelerometer data in the Newcastle study
-See for more information <insert reference to paper>.
+See for more information [insert reference to paper].
 
 ## preprocess_acc_data.R
 Uses GGIR to pre-process the accelerometer binary files.
