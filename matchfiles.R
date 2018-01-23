@@ -225,6 +225,16 @@ for (location in c("left","right")) {
                                                     psgacc$stagescore %in% definesleep ==TRUE)))
                                   / totalsleepstage) * 100,digits=2)
     output$Sens1[h] = perc_psg_eq_accinbed
+    totaloutofbed = length(which(psgacc$timeinbed == 0))
+    
+    if (totaloutofbed > (12*60)) {
+      output$NPV[h] = round(((totaloutofbed -
+                                length(which(psgacc$timeinbed == 0 &
+                                               psgacc$stagescore %in% definesleep ==TRUE)))
+                             / totaloutofbed) * 100,digits=2)
+    } else {
+      output$NPV[h] = NA
+    }
     output$totaloutofbed[h] = totaloutofbed/12 # in minutes
     output$id[h] = id
     output$tib.threshold[h] = round(sptwindow$tib.threshold,digits=2)
@@ -283,7 +293,7 @@ print(range(meth_diff))
 norm = which(output_left$Disorder==0)
 diag = which(output_left$Disorder==1)
 plot(output_left$true_PSTdur[norm],meth_diff[norm],xlab="PSG (hours)",
-     ylab="Algorithm  - PSG (hours)",main="SPT-window duration (left wrist)",
+     ylab="HDCZA - PSG (hours)",main="SPT-window duration (left wrist)",
      pch=19,bty="l",ylim=YLIM,xlim=range(output$true_PSTdur),cex=CX,cex.lab=CXL,cex.axis=CXA,cex.main=CXM,font.lab=FL)
 lines(output_left$true_PSTdur[diag],meth_diff[diag],pch=1,type="p",cex=CX)
 addLoAlines(meth_diff)
@@ -293,7 +303,7 @@ print(range(meth_diff))
 norm = which(output_right$Disorder==0)
 diag = which(output_right$Disorder==1)
 plot(output_right$true_PSTdur[norm],meth_diff[norm],xlab="PSG (hours)",
-     ylab="Algorithm  - PSG (hours)",main="SPT-window duration (right wrist)",
+     ylab="HDCZA  - PSG (hours)",main="SPT-window duration (right wrist)",
      pch=19,bty="l",ylim=YLIM,xlim=range(output$true_PSTdur),cex=CX,cex.lab=CXL,cex.axis=CXA,cex.main=CXM,font.lab=FL)
 lines(output_right$true_PSTdur[diag],meth_diff[diag],pch=1,type="p",cex=CX)
 addLoAlines(meth_diff)
@@ -302,7 +312,7 @@ meth_diff = output_left$est_sleepdur - output_left$true_sleepdur
 norm = which(output_left$Disorder==0)
 diag = which(output_left$Disorder==1)
 plot(output_left$true_sleepdur[norm],meth_diff[norm],xlab="PSG (hours)",
-     ylab="Algorithm - PSG (hours)",main="Sleep duration (left wrist)",
+     ylab="HDCZA - PSG (hours)",main="Sleep duration (left wrist)",
      pch=19,bty="l",ylim=YLIM,xlim=range(output$true_sleepdur),cex=CX,cex.lab=CXL,cex.axis=CXA,cex.main=CXM,font.lab=FL)
 lines(output_left$true_sleepdur[diag],meth_diff[diag],pch=1,type="p",cex=CX)
 addLoAlines(meth_diff)
@@ -311,7 +321,7 @@ meth_diff = output_right$est_sleepdur - output_right$true_sleepdur
 norm = which(output_right$Disorder==0)
 diag = which(output_right$Disorder==1)
 plot(output_right$true_sleepdur[norm],meth_diff[norm],xlab="PSG (hours)",
-     ylab="Algorithm  - PSG (hours)",main="Sleep duration (right wrist)",
+     ylab="HDCZA  - PSG (hours)",main="Sleep duration (right wrist)",
      pch=19,bty="l",ylim=YLIM,xlim=range(output$true_sleepdur),cex=CX,cex.lab=CXL,cex.axis=CXA,cex.main=CXM,font.lab=FL)
 lines(output_right$true_sleepdur[diag],meth_diff[diag],pch=1,type="p",cex=CX)
 addLoAlines(meth_diff)
