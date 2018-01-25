@@ -1,19 +1,20 @@
 rm(list=ls())
 graphics.off()
-
+#==================================================
+# user input needed:
 simulate24 = TRUE # whether to simulate 24 hours of data or not
-
-# specific data directories
+# specify data directories
 pathpsg = "/media/vincent/Exeter/psg_study/cleaned_psg"
 pathacc = "/media/vincent/Exeter/psg_study/cleaned_acc"
 pathparticipantinfo = "/media/vincent/Exeter/psg_study/data participants/participants_diagnosis.csv"
 pathfigures = "/media/vincent/Exeter"
-source("~/GGIR/psg-newcastle/tib.R")
+# load the function for hdcza algorithm
+source("~/GGIR/psg-newcastle/tib.R") 
+#==================================================
 # extract filenames
 namespsg = dir(pathpsg, full.names = TRUE)
 namesacc = dir(pathacc, full.names = TRUE)
 NN = length(namespsg)+length(namesacc)
-#==================================================
 # match psg and accelerometer files
 # initialize data frame
 comp = data.frame(fname=rep(" ",NN),method=rep(" ",NN),time=rep(" ",NN),id=rep(0,NN),stringsAsFactors = FALSE)
@@ -179,6 +180,7 @@ for (location in c("left","right")) {
       output$true_PSTdur[h] = length(sleepscore) / 720
       output$true_PSTonset[h] = as.character(psgacc$Time..hh.mm.ss.[which(pss != 0)[1]])
       output$true_PSTwake[h] = as.character(psgacc$Time..hh.mm.ss.[(length(pss)-match(1,rev(psstmp))+1)])
+      
       sleepscore[which(sleepscore != 0)] = 1
       sleep_psg = data.frame(psg = tib_true_series,time=tib_true_series_time,sleepepisodes_true=psstmp)
       # merge psg and accelerometer (algorithm) based estimates
@@ -260,6 +262,10 @@ for (location in c("left","right")) {
   output$true_PSTwake_nm = convchartime2number(output$true_PSTwake)
   output$est_PSTonset_nm = convchartime2number(output$est_PSTonset)
   output$est_PSTwake_nm = convchartime2number(output$est_PSTwake)
+  
+  output$error_PSTonset = output$est_PSTonset_nm - output$true_PSTonset_nm
+  output$error_PSTwake = output$est_PSTwake_nm - output$true_PSTwake_nm
+
   diagn = read.csv(file=pathparticipantinfo)
   if (location == "right") output_right = merge(output,diagn,by="id")
   if (location == "left") output_left = merge(output,diagn,by="id")
@@ -326,3 +332,15 @@ plot(output_right$true_sleepdur[norm],meth_diff[norm],xlab="PSG (hours)",
 lines(output_right$true_sleepdur[diag],meth_diff[diag],pch=1,type="p",cex=CX)
 addLoAlines(meth_diff)
 dev.off()
+
+
+# MAE calculation
+output_left$error_PSTonset_abs = abs(output_left$error_PSTonset) # calculate absolute error in wake time per night
+output_left$error_PSTwake_abs = abs(output_left$error_PSTwake) # calculate absolute error in onset time per night
+MAE = round(mean(c(output_left$error_PSTwake_abs,output_left$error_PSTonset_abs)),digits=3) # calcualte mean acros individuals.
+print(paste0("MAE left = ", MAE * 60))
+
+output_right$error_PSTonset_abs = abs(output_right$error_PSTonset) # calculate absolute error in wake time per night
+output_right$error_PSTwake_abs = abs(output_right$error_PSTwake) # calculate absolute error in onset time per night
+MAE = round(mean(c(output_right$error_PSTwake_abs,output_right$error_PSTonset_abs)),digits=3) # calcualte mean acros individuals.
+print(paste0("MAE right = ", MAE * 60))
