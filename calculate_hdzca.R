@@ -1,5 +1,5 @@
 #=============================
-inbed = function(angle, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 30, outofbedsize = 60, ws3 = 5) {
+calculate_hdcza = function(angle, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 30, outofbedsize = 60, ws3 = 5) {
   # exploratory function 27/7/2017
   medabsdi = function(angle) {
     angvar = stats::median(abs(diff(angle))) #50th percentile, do not use mean because that will be outlier dependent

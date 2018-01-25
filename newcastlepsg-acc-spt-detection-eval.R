@@ -9,7 +9,7 @@ pathacc = "/media/vincent/Exeter/psg_study/cleaned_acc"
 pathparticipantinfo = "/media/vincent/Exeter/psg_study/data participants/participants_diagnosis.csv"
 pathfigures = "/media/vincent/Exeter"
 # load the function for hdcza algorithm
-source("~/GGIR/psg-newcastle/tib.R") 
+source("~/GGIR/psg-newcastle/calculate_hdcza.R") 
 #==================================================
 # extract filenames
 namespsg = dir(pathpsg, full.names = TRUE)
@@ -134,7 +134,7 @@ for (location in c("left","right")) {
     psgacc_expand$ENMO = 0.1
     psgacc = rbind(psgacc,psgacc_expand)
     # now use the expanded data for spt window detection.
-    sptwindow = inbed(psgacc$anglez, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 30, outofbedsize = 60, ws3 = 5)
+    sptwindow = calculate_hdcza(psgacc$anglez, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 30, outofbedsize = 60, ws3 = 5)
     # detect sleep episodes within the spt window based on previously described algorithm: journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533
     postch = which(abs(diff(psgacc$anglez)) > 5) #posture change of at least j degrees
     # count posture changes that happen less than once per ten minutes
