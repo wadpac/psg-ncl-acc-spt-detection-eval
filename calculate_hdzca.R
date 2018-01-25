@@ -1,6 +1,4 @@
-#=============================
 calculate_hdcza = function(angle, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 30, outofbedsize = 60, ws3 = 5) {
-  # exploratory function 27/7/2017
   medabsdi = function(angle) {
     angvar = stats::median(abs(diff(angle))) #50th percentile, do not use mean because that will be outlier dependent
     return(angvar)
@@ -9,9 +7,8 @@ calculate_hdcza = function(angle, k =60, perc = 0.1, inbedthreshold = 15, bedblo
   nomov = rep(0,length(x)) # no movement
   inbedtime = rep(NA,length(x))
   pp = quantile(x,probs=c(perc)) * inbedthreshold 
-  # if (pp == 0) pp = 7
-  if (pp < 0.13) pp = 0.13 # needed because dummy data is inserted
-  if (pp > 0.50) pp = 0.50 # needed because dummy data is inserted
+  if (pp < 0.13) pp = 0.13 # needed because dummy data is inserted in psg study (this line will not be part of GGIR code)
+  if (pp > 0.50) pp = 0.50 # needed because dummy data is inserted in psg study (this line will not be part of GGIR code)
   nomov[which(x < pp)] = 1
   nomov = c(0,nomov,0)
   s1 = which(diff(nomov) == 1) #start of blocks in bed
@@ -82,10 +79,6 @@ calculate_hdcza = function(angle, k =60, perc = 0.1, inbedthreshold = 15, bedblo
   }
   sleep = sdl1
   sleep = as.data.frame(sleep)
-    
-  
-  
-  #
   tib.threshold = pp
   invisible(list(lightsout=lightsout,lightson=lightson,tib.threshold=tib.threshold, sleep=sleep))
 }
