@@ -9,7 +9,7 @@ pathacc = "/media/vincent/Exeter/psg_study/cleaned_acc"
 pathparticipantinfo = "/media/vincent/Exeter/psg_study/data participants/participants_diagnosis.csv"
 pathfigures = "/media/vincent/Exeter"
 # load the function for hdcza algorithm
-source("~/GGIR/psg-newcastle/calculate_hdcza.R") 
+source("~/GGIR/psg-newcastle/calculate_hdzca.R") 
 #==================================================
 # extract filenames
 namespsg = dir(pathpsg, full.names = TRUE)
