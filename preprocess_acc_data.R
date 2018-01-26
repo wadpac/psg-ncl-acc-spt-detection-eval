@@ -5,30 +5,30 @@ f1 = c() #file to end with if used in serial analyses (modify accordingly, if in
 mode= c(1) #What part of the analysis needs to be done (options: 1,2,3,4 and 5)
 #======================================================
 
-datadir = "/media/windows-share/Exeter/psg_study/accdata_psg_nc"
-# datadir = "/media/windows-share/London/testbinaries"
-outputdir = "/media/windows-share/Exeter/psg_study"
-studyname = "psg"
-dirR = "/home/vincent/GGIR/mcs-acc/R"
+# datadir = "/media/vincent/Exeter/psg_study/accdata_psg_nc" # geneactiv dataset Newcastle
+datadir = "/media/vincent/Exeter/Geneactiv validation data/psgaxivityfiles" # axivity dataset
+outputdir = "/media/vincent/Exeter/psg_study"
+studyname = "psgaxivityfiles" #"accdata_psg_nc"
+dirR = "/home/vincent/GGIR/GGIR/R"
 loglocation = ""
 
 #=====================================================================================
-# library(GGIR)
+library(GGIR)
 # load functions directly from local clone of the R package repository
-ffnames = dir(dirR) # creating list of filenames of scriptfiles to load
-for (i in 1:length(ffnames)) {
-  source(paste(dirR,"/",ffnames[i],sep="")) #loading scripts for reading geneactiv data
-}
+# ffnames = dir(dirR) # creating list of filenames of scriptfiles to load
+# for (i in 1:length(ffnames)) {
+#   source(paste(dirR,"/",ffnames[i],sep="")) #loading scripts for reading geneactiv data
+# }
 
-# library("MASS")
-# library("mmap")
-# library("GENEAread")
-# library("bitops")
-# library("matlab")
-# library("signal")
-# library("tuneR")
-# library("zoo")
-# library("data.table")
+library("MASS")
+library("mmap")
+library("GENEAread")
+library("bitops")
+library("matlab")
+library("signal")
+library("tuneR")
+library("zoo")
+library("data.table")
 
 g.shell.GGIR(#=======================================
              # INPUT NEEDED:
@@ -41,7 +41,7 @@ g.shell.GGIR(#=======================================
              studyname=studyname, #specify above
              f0=f0, #specify above
              f1=f1, #specify above
-             overwrite = TRUE, #overwrite previous milestone data?
+             overwrite = FALSE, #overwrite previous milestone data?
              do.imp=TRUE, # Do imputation? (recommended)
              idloc=1, #id location (1 = file header, 2 = filename)Rcpp::
              print.filename=TRUE,
@@ -54,8 +54,8 @@ g.shell.GGIR(#=======================================
              do.cal= TRUE, # Apply autocalibration? (recommended)
              do.enmo = TRUE, #Needed for physical activity analysis
              do.anglez=TRUE, #Needed for sleep detection
-             do.angley=TRUE,
-             do.anglex=TRUE,
+             do.angley=FALSE, #TRUE
+             do.anglex=FALSE, #TRUE
              
              # do.roll_med_acc_x=TRUE,
              # do.roll_med_acc_y=TRUE,
@@ -64,7 +64,7 @@ g.shell.GGIR(#=======================================
              # do.dev_roll_med_acc_y=TRUE,
              # do.dev_roll_med_acc_z=TRUE,
              
-             chunksize=1, #size of data chunks to be read (value = 1 is maximum)
+             chunksize=0.8, #size of data chunks to be read (value = 1 is maximum)
              printsummary=TRUE,
              #-------------------------------
              # Part 2 parameters:
@@ -74,7 +74,7 @@ g.shell.GGIR(#=======================================
              ndayswindow=7, #only relevant when strategy = 3
              hrs.del.start = 0, # Only relevant when strategy = 2. How many HOURS need to be ignored at the START of the measurement?
              hrs.del.end = 0, # Only relevant when strategy = 2. How many HOURS need to be ignored at the END of the measurement?
-             maxdur = 2, # How many DAYS of measurement do you maximumally expect?
+             maxdur = 14, #2 # How many DAYS of measurement do you maximumally expect?
              includedaycrit = 5, # number of minimum valid hours in a day to attempt physical activity analysis
              L5M5window = c(0,24), #window over which to calculate L5 and M5
              M5L5res = 10, #resolution in minutes of M5 and L5 calculation
