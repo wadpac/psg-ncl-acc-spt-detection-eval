@@ -74,7 +74,7 @@ g.shell.GGIR(#=======================================
              ndayswindow=7, #only relevant when strategy = 3
              hrs.del.start = 0, # Only relevant when strategy = 2. How many HOURS need to be ignored at the START of the measurement?
              hrs.del.end = 0, # Only relevant when strategy = 2. How many HOURS need to be ignored at the END of the measurement?
-             maxdur = 14, #2 # How many DAYS of measurement do you maximumally expect?
+             maxdur = 2, #2 # How many DAYS of measurement do you maximumally expect?
              includedaycrit = 5, # number of minimum valid hours in a day to attempt physical activity analysis
              L5M5window = c(0,24), #window over which to calculate L5 and M5
              M5L5res = 10, #resolution in minutes of M5 and L5 calculation
@@ -92,7 +92,7 @@ g.shell.GGIR(#=======================================
              # Report generation
              #-------------------------------
              # Key functions: Generating reports based on meta-data
-             do.report=c(), #for what parts does and report need to be generated? (option: 2, 4 and 5)
+             do.report=c(2), #for what parts does and report need to be generated? (option: 2, 4 and 5)
              visualreport=FALSE,
              dofirstpage = TRUE, #first page of pdf-report with simple summary histograms
              viewingwindow=1) #viewingwindow of visual report: 1 centres at day and 2 centers at night
