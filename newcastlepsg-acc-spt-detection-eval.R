@@ -349,6 +349,11 @@ Csleepdur = cor.test(output$est_sleepdur,output$true_sleepdur,paired = TRUE)
 Csleepeff = cor.test(output$est_sle_eff,output$true_sle_eff,paired = TRUE)
 
 summarizet = function(x) {
+  sum = c(paste0(round(x$estimate*60,digits=0)," (95% CI:",round(x$conf.int[1]*60,digits=0)," - ",round(x$conf.int[2]*60,digits=0),")"), 
+          paste0(round(x$statistic,digits=2),"; ",round(x$parameter,digits=2)), as.character(round(x$p.value,digits=2)))
+  return(sum)
+}
+summarizer = function(x) {
   sum = c(paste0(round(x$estimate,digits=2)," (95% CI:",round(x$conf.int[1],digits=2)," - ",round(x$conf.int[2],digits=2),")"), 
           paste0(round(x$statistic,digits=2),"; ",round(x$parameter,digits=2)), as.character(round(x$p.value,digits=2)))
   return(sum)
@@ -361,12 +366,12 @@ table5[1,2:4] = summarizet(Tonset)
 table5[2,2:4] = summarizet(Twake)
 table5[3,2:4] = summarizet(Tdur)
 table5[4,2:4] = summarizet(Tsleepdur)
-table5[5,2:4] = summarizet(Tsleepeff)
-table5[6,2:4] = summarizet(Conset)
-table5[7,2:4] = summarizet(Cwake)
-table5[8,2:4] = summarizet(Cdur)
-table5[9,2:4] = summarizet(Csleepdur)
-table5[10,2:4] = summarizet(Csleepeff)
+table5[5,2:4] = summarizer(Tsleepeff)
+table5[6,2:4] = summarizer(Conset)
+table5[7,2:4] = summarizer(Cwake)
+table5[8,2:4] = summarizer(Cdur)
+table5[9,2:4] = summarizer(Csleepdur)
+table5[10,2:4] = summarizer(Csleepeff)
 
 print(summary(output$auc,digits=2))
 print(summary(output$accuracy,digits=2))
