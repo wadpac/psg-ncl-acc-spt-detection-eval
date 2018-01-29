@@ -300,7 +300,7 @@ CXL = 0.9
 CXA = 0.8
 FL = 1 # font label
 CXLegend = 0.7
-YLIM = c(-7,4.1)
+YLIM = c(-7,7)
 jpeg(file=paste0(pathfigures,"/Figure3_penn.jpeg"),width = 7,height = 3.5,units = "in",res=500)
 par(mfrow=c(1,2),mar=c(4,5,5,2))
 
