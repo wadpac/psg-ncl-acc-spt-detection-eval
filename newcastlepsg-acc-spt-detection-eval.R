@@ -95,19 +95,19 @@ for (location in c("right")) {
     # ========================================================
     # We know that time blocks are not perfectly synced (just like in all PSG labs around the world)
     # Therefore, look for optimal shift (a bit similar to http://iopscience.iop.org/article/10.1088/2057-1976/aa985f/meta)
-    radi = 120
-    shift = rep(0,(2*radi)+1)
-    radilist = -radi:radi
-    for (g in radilist) {
-      t2 = nrow(psgacc)
-      shift[g+radi+1] = length(which(psgacc$stagescore[(radi+g+1):(t2-radi+g)] == 0 & psgacc$ENMO[(radi+1):(t2-radi)] > 0.02))
-    }
-    finalshift = radilist[median(which.min(shift))]
-    # shift the timestamps for psg
-    newtime = psgacc$time[(radi+finalshift+1):(t2-radi+finalshift)]
-    psgacc = psgacc[(radi+1):(t2-radi),]
-    psgacc$time = newtime
-    psgacc = merge(PSG,ACC,by="timenum")
+    # radi = 120
+    # shift = rep(0,(2*radi)+1)
+    # radilist = -radi:radi
+    # for (g in radilist) {
+    #   t2 = nrow(psgacc)
+    #   shift[g+radi+1] = length(which(psgacc$stagescore[(radi+g+1):(t2-radi+g)] == 0 & psgacc$ENMO[(radi+1):(t2-radi)] > 0.02))
+    # }
+    # finalshift = radilist[median(which.min(shift))]
+    # # shift the timestamps for psg
+    # newtime = psgacc$time[(radi+finalshift+1):(t2-radi+finalshift)]
+    # psgacc = psgacc[(radi+1):(t2-radi),]
+    # psgacc$time = newtime
+    # psgacc = merge(PSG,ACC,by="timenum")
     #=======================================================
     # apply spt-window detection and compare estimates
     # first expand data with simulated data to create realistic conditions
@@ -295,7 +295,7 @@ addLoAlines = function(meth_diff){
 
 if (simulate24 ==  FALSE) {
   # Figure 3 in paper
-  CX = 0.9
+  CX = 0.8
   CXM = 0.9
   CXL = 0.9
   CXA = 0.8
@@ -337,36 +337,36 @@ print(paste0("MAE right = ", MAE * 60))
 
 # Table 5
 
-Tonset = t.test(output$true_PSTonset_nm,output$est_PSTonset_nm,paired = TRUE)
-Twake = t.test(output$true_PSTwake_nm,output$est_PSTwake_nm,paired = TRUE)
-Tdur = t.test(output$true_PSTdur,output$est_PSTdur,paired = TRUE)
-Tsleepdur = t.test(output$true_sleepdur,output$est_sleepdur,paired = TRUE)
-Tsleepeff = t.test(output$true_sle_eff,output$est_sle_eff,paired = TRUE)
-Conset = cor.test(output$true_PSTonset_nm,output$est_PSTonset_nm,paired = TRUE)
-Cwake = cor.test(output$true_PSTwake_nm,output$est_PSTwake_nm,paired = TRUE)
-Cdur = cor.test(output$true_PSTdur,output$est_PSTdur,paired = TRUE)
-Csleepdur = cor.test(output$true_sleepdur,output$est_sleepdur,paired = TRUE)
-Csleepeff = cor.test(output$true_sle_eff,output$est_sle_eff,paired = TRUE)
+Tonset = t.test(output$est_PSTonset_nm,output$true_PSTonset_nm,paired = TRUE)
+Twake = t.test(output$est_PSTwake_nm,output$true_PSTwake_nm,paired = TRUE)
+Tdur = t.test(output$est_PSTdur,output$true_PSTdur,paired = TRUE)
+Tsleepdur = t.test(output$est_sleepdur,output$true_sleepdur,paired = TRUE)
+Tsleepeff = t.test(output$est_sle_eff,output$true_sle_eff,paired = TRUE)
+Conset = cor.test(output$est_PSTonset_nm,output$true_PSTonset_nm,paired = TRUE)
+Cwake = cor.test(output$est_PSTwake_nm,output$true_PSTwake_nm,paired = TRUE)
+Cdur = cor.test(output$est_PSTdur,output$true_PSTdur,paired = TRUE)
+Csleepdur = cor.test(output$est_sleepdur,output$true_sleepdur,paired = TRUE)
+Csleepeff = cor.test(output$est_sle_eff,output$true_sle_eff,paired = TRUE)
 
 summarizet = function(x) {
-  sum = c(paste0(round(x$estimate,digits=2)," (95% CI:",round(x$conf.int[1],digits=2)," - ",round(x$conf.int[2],digits=2),")"), as.character(round(x$statistic,digits=2)), 
-    as.character(round(x$parameter,digits=2)), as.character(round(x$p.value,digits=2)))
+  sum = c(paste0(round(x$estimate,digits=2)," (95% CI:",round(x$conf.int[1],digits=2)," - ",round(x$conf.int[2],digits=2),")"), 
+          paste0(round(x$statistic,digits=2),"; ",round(x$parameter,digits=2)), as.character(round(x$p.value,digits=2)))
   return(sum)
 }
 
-table5 = matrix("",10,5)
+table5 = matrix("",10,4)
 table5[1:5,1] = c("t.test onset","t.tes wake","t.test dur","t.test sleepdur","t.test sleep eff")
 table5[6:10,1] = c("cor.test onset","cor.tes wake","cor.test dur","cor.test sleepdur","cor.test sleep eff")
-table5[1,2:5] = summarizet(Tonset)
-table5[2,2:5] = summarizet(Twake)
-table5[3,2:5] = summarizet(Tdur)
-table5[4,2:5] = summarizet(Tsleepdur)
-table5[5,2:5] = summarizet(Tsleepeff)
-table5[6,2:5] = summarizet(Conset)
-table5[7,2:5] = summarizet(Cwake)
-table5[8,2:5] = summarizet(Cdur)
-table5[9,2:5] = summarizet(Csleepdur)
-table5[10,2:5] = summarizet(Csleepeff)
+table5[1,2:4] = summarizet(Tonset)
+table5[2,2:4] = summarizet(Twake)
+table5[3,2:4] = summarizet(Tdur)
+table5[4,2:4] = summarizet(Tsleepdur)
+table5[5,2:4] = summarizet(Tsleepeff)
+table5[6,2:4] = summarizet(Conset)
+table5[7,2:4] = summarizet(Cwake)
+table5[8,2:4] = summarizet(Cdur)
+table5[9,2:4] = summarizet(Csleepdur)
+table5[10,2:4] = summarizet(Csleepeff)
 
 print(summary(output$auc,digits=2))
 print(summary(output$accuracy,digits=2))
