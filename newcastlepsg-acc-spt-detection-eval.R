@@ -2,7 +2,7 @@ rm(list=ls())
 graphics.off()
 #==================================================
 # user input needed:
-simulate24 = TRUE # whether to simulate 24 hours of data or not
+simulate24 = FALSE # whether to simulate 24 hours of data or not
 # specify data directories
 pathpsg = "/media/vincent/Exeter/psg_study/cleaned_psg"
 pathacc = "/media/vincent/Exeter/psg_study/cleaned_acc"
@@ -357,11 +357,16 @@ CsleepeffR = cor.test(output_right$est_sle_eff,output_right$true_sle_eff,paired 
 
 
 summarizet = function(x) {
-  sum = c(paste0(round(x$estimate,digits=2)," (95% CI:",round(x$conf.int[1],digits=2)," - ",round(x$conf.int[2],digits=2),")"), 
+  sum = c(paste0(round(x$estimate * 60,digits=0)," (95% CI:",round(x$conf.int[1] * 60,digits=0)," - ",round(x$conf.int[2]  * 60,digits=0),")"), 
           paste0(round(x$statistic,digits=2),"; ",round(x$parameter,digits=2)), as.character(round(x$p.value,digits=2)))
   return(sum)
 }
 
+summarizer = function(x) {
+  sum = c(paste0(round(x$estimate,digits=2)," (95% CI:",round(x$conf.int[1],digits=2)," - ",round(x$conf.int[2],digits=2),")"), 
+          paste0(round(x$statistic,digits=2),"; ",round(x$parameter,digits=2)), as.character(round(x$p.value,digits=2)))
+  return(sum)
+}
 table4 = matrix("",10,7)
 table4[1:10,1] = c("t.test onset","cor.test onset","t.tes wake","cor.tes wake","t.test dur","cor.test dur",
                   "t.test sleepdur","cor.test sleepdur","t.test sleep eff","cor.test sleep eff")
@@ -369,12 +374,12 @@ table4[1,2:7] = c(summarizet(Tonset),summarizet(TonsetR))
 table4[3,2:7] = c(summarizet(Twake),summarizet(TwakeR))
 table4[5,2:7] = c(summarizet(Tdur),summarizet(TdurR))
 table4[7,2:7] = c(summarizet(Tsleepdur),summarizet(TsleepdurR))
-table4[9,2:7] = c(summarizet(Tsleepeff),summarizet(TsleepeffR))
-table4[2,2:7] = c(summarizet(Conset),summarizet(ConsetR))
-table4[4,2:7] = c(summarizet(Cwake),summarizet(CwakeR))
-table4[6,2:7] = c(summarizet(Cdur),summarizet(CdurR))
-table4[8,2:7] = c(summarizet(Csleepdur),summarizet(CsleepdurR))
-table4[10,2:7] = c(summarizet(Csleepeff),summarizet(CsleepeffR))
+table4[9,2:7] = c(summarizer(Tsleepeff),summarizet(TsleepeffR))
+table4[2,2:7] = c(summarizer(Conset),summarizet(ConsetR))
+table4[4,2:7] = c(summarizer(Cwake),summarizet(CwakeR))
+table4[6,2:7] = c(summarizer(Cdur),summarizet(CdurR))
+table4[8,2:7] = c(summarizer(Csleepdur),summarizet(CsleepdurR))
+table4[10,2:7] = c(summarizer(Csleepeff),summarizet(CsleepeffR))
 
 print(summary(output_left$auc,digits=2))
 print(summary(output_left$accuracy,digits=2))
