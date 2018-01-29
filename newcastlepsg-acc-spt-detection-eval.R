@@ -2,7 +2,7 @@ rm(list=ls())
 graphics.off()
 #==================================================
 # user input needed:
-simulate24 = TRUE # whether to simulate 24 hours of data or not
+simulate24 = FALSE # whether to simulate 24 hours of data or not
 # specify data directories
 pathpsg = "/media/vincent/Exeter/psg_study/cleaned_psg"
 pathacc = "/media/vincent/Exeter/psg_study/cleaned_acc"
