@@ -2,7 +2,7 @@ rm(list=ls())
 graphics.off()
 #==================================================
 # user input needed:
-simulate24 = TRUE # whether to simulate 24 hours of data or not
+simulate24 = FALSE # whether to simulate 24 hours of data or not
 # specify data directories
 pathpsg = "/media/vincent/Exeter/psg_study/cleaned_psg_penn"
 pathacc = "/media/vincent/Exeter/psg_study/cleaned_acc_penn"
@@ -73,7 +73,7 @@ for (location in c("right")) {
     while(nrow(psgacc) == 0) {
       PSG$timenum = PSG$timenum + 2 # psg times are not rounded to 5 seconds
       psgacc = merge(PSG,ACC,by="timenum")
-    #   kkkk
+      #   kkkk
       # if (cnt == 10) {
       #   if (PSG$timenum[1] - ACC$timenum[1] > 12*3600) {
       #     print(paste0("timeshift backward",id))
@@ -202,11 +202,11 @@ for (location in c("right")) {
       roccurve = roc(sleep_est_psg$psg ~ sleep_est_psg$est)
       output$auc[h] = auc(roccurve)
       output$accuracy[h] = length(which(sleep_est_psg$psg == sleep_est_psg$est)) / nrow(sleep_est_psg)
-
+      
     }
     output$est_sleepdur[h] = length(which(sleep_est_psg$sleepepisodes_est == 1)) / (12*60)
     output$true_sleepdur[h] = length(which(sleep_est_psg$sleepepisodes_true == 1)) / (12*60)
-
+    
     #===================================================================
     # plot for visual check
     show = blocksize:(nrow(psgacc)-blocksize+1)
@@ -279,7 +279,7 @@ for (location in c("right")) {
   
   output$error_PSTonset = output$est_PSTonset_nm - output$true_PSTonset_nm
   output$error_PSTwake = output$est_PSTwake_nm - output$true_PSTwake_nm
-
+  
   diagn = read.csv(file=pathparticipantinfo)
   if (location == "right") output_right = merge(output,diagn,by="id")
 }
@@ -293,40 +293,82 @@ addLoAlines = function(meth_diff){
   abline(h=mean(meth_diff)+(1.96*sd(meth_diff)),lty=3)
 }
 
-# Figure 3 in paper
-CX = 0.9
-CXM = 0.9
-CXL = 0.9
-CXA = 0.8
-FL = 1 # font label
-CXLegend = 0.7
-YLIM = c(-7,7)
-jpeg(file=paste0(pathfigures,"/Figure3_penn.jpeg"),width = 7,height = 3.5,units = "in",res=500)
-par(mfrow=c(1,2),mar=c(4,5,5,2))
-
-meth_diff = output_right$est_PSTdur - output_right$true_PSTdur
-print(range(meth_diff))
-norm = which(output_right$Disorder==0)
-diag = which(output_right$Disorder==1)
-plot(output_right$true_PSTdur[norm],meth_diff[norm],xlab="PSG (hours)",
-     ylab="HDCZA  - PSG (hours)",main="SPT-window duration",
-     pch=19,bty="l",ylim=YLIM,xlim=range(output$true_PSTdur),cex=CX,cex.lab=CXL,cex.axis=CXA,cex.main=CXM,font.lab=FL)
-lines(output_right$true_PSTdur[diag],meth_diff[diag],pch=1,type="p",cex=CX)
-addLoAlines(meth_diff)
-
-meth_diff = output_right$est_sleepdur - output_right$true_sleepdur
-norm = which(output_right$Disorder==0)
-diag = which(output_right$Disorder==1)
-plot(output_right$true_sleepdur[norm],meth_diff[norm],xlab="PSG (hours)",
-     ylab="HDCZA  - PSG (hours)",main="Sleep duration",
-     pch=19,bty="l",ylim=YLIM,xlim=range(output$true_sleepdur),cex=CX,cex.lab=CXL,cex.axis=CXA,cex.main=CXM,font.lab=FL)
-lines(output_right$true_sleepdur[diag],meth_diff[diag],pch=1,type="p",cex=CX)
-addLoAlines(meth_diff)
-dev.off()
-
+if (simulate24 ==  FALSE) {
+  # Figure 3 in paper
+  CX = 0.9
+  CXM = 0.9
+  CXL = 0.9
+  CXA = 0.8
+  FL = 1 # font label
+  CXLegend = 0.7
+  YLIM = c(-4,4)
+  jpeg(file=paste0(pathfigures,"/Figure3_penn.jpeg"),width = 7,height = 3.5,units = "in",res=500)
+  par(mfrow=c(1,2),mar=c(4,5,5,2))
+  
+  meth_diff = output_right$est_PSTdur - output_right$true_PSTdur
+  print(range(meth_diff))
+  norm = which(output_right$Disorder==0)
+  diag = which(output_right$Disorder==1)
+  plot(output_right$true_PSTdur[norm],meth_diff[norm],xlab="PSG (hours)",
+       ylab="HDCZA  - PSG (hours)",main="SPT-window duration",
+       pch=19,bty="l",ylim=YLIM,xlim=range(output$true_PSTdur),cex=CX,cex.lab=CXL,cex.axis=CXA,cex.main=CXM,font.lab=FL)
+  lines(output_right$true_PSTdur[diag],meth_diff[diag],pch=1,type="p",cex=CX)
+  addLoAlines(meth_diff)
+  
+  meth_diff = output_right$est_sleepdur - output_right$true_sleepdur
+  norm = which(output_right$Disorder==0)
+  diag = which(output_right$Disorder==1)
+  plot(output_right$true_sleepdur[norm],meth_diff[norm],xlab="PSG (hours)",
+       ylab="HDCZA  - PSG (hours)",main="Sleep duration",
+       pch=19,bty="l",ylim=YLIM,xlim=range(output$true_sleepdur),cex=CX,cex.lab=CXL,cex.axis=CXA,cex.main=CXM,font.lab=FL)
+  lines(output_right$true_sleepdur[diag],meth_diff[diag],pch=1,type="p",cex=CX)
+  addLoAlines(meth_diff)
+  dev.off()
+} else {
+  print("Figure 3 not recreated")
+}
 
 # MAE calculation
 output_right$error_PSTonset_abs = abs(output_right$error_PSTonset) # calculate absolute error in wake time per night
 output_right$error_PSTwake_abs = abs(output_right$error_PSTwake) # calculate absolute error in onset time per night
 MAE = round(mean(c(output_right$error_PSTwake_abs,output_right$error_PSTonset_abs)),digits=3) # calcualte mean acros individuals.
 print(paste0("MAE right = ", MAE * 60))
+
+
+# Table 5
+
+Tonset = t.test(output$true_PSTonset_nm,output$est_PSTonset_nm,paired = TRUE)
+Twake = t.test(output$true_PSTwake_nm,output$est_PSTwake_nm,paired = TRUE)
+Tdur = t.test(output$true_PSTdur,output$est_PSTdur,paired = TRUE)
+Tsleepdur = t.test(output$true_sleepdur,output$est_sleepdur,paired = TRUE)
+Tsleepeff = t.test(output$true_sle_eff,output$est_sle_eff,paired = TRUE)
+Conset = cor.test(output$true_PSTonset_nm,output$est_PSTonset_nm,paired = TRUE)
+Cwake = cor.test(output$true_PSTwake_nm,output$est_PSTwake_nm,paired = TRUE)
+Cdur = cor.test(output$true_PSTdur,output$est_PSTdur,paired = TRUE)
+Csleepdur = cor.test(output$true_sleepdur,output$est_sleepdur,paired = TRUE)
+Csleepeff = cor.test(output$true_sle_eff,output$est_sle_eff,paired = TRUE)
+
+summarizet = function(x) {
+  sum = c(paste0(round(x$estimate,digits=2)," (95% CI:",round(x$conf.int[1],digits=2)," - ",round(x$conf.int[2],digits=2),")"), as.character(round(x$statistic,digits=2)), 
+    as.character(round(x$parameter,digits=2)), as.character(round(x$p.value,digits=2)))
+  return(sum)
+}
+
+table5 = matrix("",10,5)
+table5[1:5,1] = c("t.test onset","t.tes wake","t.test dur","t.test sleepdur","t.test sleep eff")
+table5[6:10,1] = c("cor.test onset","cor.tes wake","cor.test dur","cor.test sleepdur","cor.test sleep eff")
+table5[1,2:5] = summarizet(Tonset)
+table5[2,2:5] = summarizet(Twake)
+table5[3,2:5] = summarizet(Tdur)
+table5[4,2:5] = summarizet(Tsleepdur)
+table5[5,2:5] = summarizet(Tsleepeff)
+table5[6,2:5] = summarizet(Conset)
+table5[7,2:5] = summarizet(Cwake)
+table5[8,2:5] = summarizet(Cdur)
+table5[9,2:5] = summarizet(Csleepdur)
+table5[10,2:5] = summarizet(Csleepeff)
+
+print(summary(output$auc,digits=2))
+print(summary(output$accuracy,digits=2))
+print(summary(output$Sens1,digits=2))
+
