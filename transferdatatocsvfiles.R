@@ -1,8 +1,8 @@
 rm(list=ls())
 graphics.off()
-path = "/media/windows-share/Exeter/psg_study/output_accdata_psg_nc/meta/basic/"
+path = "/media/vincent/Exeter/psg_study/output_accdata_psg_nc/meta/basic/"
 
-psglogs = "/media/windows-share/Exeter/psg_study/data psg/txt"
+psglogs = "/media/vincent/Exeter/psg_study/data psg/txt"
 
 accnames = dir(path,full.names = TRUE)
 lognames = dir(psglogs,full.names = TRUE)
@@ -28,7 +28,7 @@ fixmidnight = function(x) {
 }
 
 
-repropsg = TRUE
+repropsg = FALSE
 if (repropsg == TRUE) {
   for (i in 1:length(lognames)) { #
     logheader = as.matrix(read.csv(lognames[i],nrow=15,sep = "\t"))
@@ -47,7 +47,7 @@ if (repropsg == TRUE) {
       logdata$stagescore[which(logdata$Sleep.Stage == "N2")] = 3
       logdata$stagescore[which(logdata$Sleep.Stage == "N3")] = 4
       # Now save as csv file with id number in the file name
-      write.csv(logdata,file=paste0("/media/windows-share/Exeter/psg_study/cleaned_psg/psg_participant",id,".csv"),row.names = FALSE)
+      write.csv(logdata,file=paste0("/media/vincent/Exeter/psg_study/cleaned_psg/psg_participant",id,".csv"),row.names = FALSE)
     }
   }
 }
@@ -63,6 +63,7 @@ for (j in 1:length(accnames)) {
   M$metashort$timestampPOSIX = as.POSIXlt( M$metashort$timestamp,format="%Y-%m-%dT%H:%M:%S%z",tz="Europe/London")
   id = as.numeric(unlist(strsplit(unlist(strsplit(accnames[j],"SLEEP"))[2],"_"))[1])
   nonwear = which(M$metalong$nonwearscore >= 2)
+  if (id == 51) M$metashort = M$metashort[1:10000,] 
   if (length(nonwear) > 4) {
     # print(paste0(j," ",id))
     if (id == 23) { #data removed based on visual inspection of non-wear period
@@ -84,6 +85,7 @@ for (j in 1:length(accnames)) {
       M$metashort = M$metashort[1:11000,]
     } else if (id == 49) {
       M$metashort = M$metashort[1:8600,] 
+ 
     } else if (id == 57) {
       M$metashort = M$metashort[1:15000,]
     } else if (id == 60) {
@@ -91,6 +93,6 @@ for (j in 1:length(accnames)) {
     }
   }
   write.csv(M$metashort,file=
-              paste0("/media/windows-share/Exeter/psg_study/cleaned_acc/acc_participant",id,
+              paste0("/media/vincent/Exeter/psg_study/cleaned_acc/acc_participant",id,
                      "_location",as.character(I$header['Device_Location_Code',]),".csv"),row.names = FALSE)
 }
