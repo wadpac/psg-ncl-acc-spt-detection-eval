@@ -216,7 +216,7 @@ for (location in c("right")) {
     CA = 0.8
     plot(psgacc$time[show],psgacc$stagescore[show],pch=20,ylim=c(-0.5,5),type="l",main="",bty="l",axes=FALSE,xlab="",ylab="psg sleep stage", cex.lab = CL)
     axis(side = 2,at = 0:4,labels = c("Wake","REM","N1","N2","N3"),tick = TRUE,cex.axis=0.6,las=1)
-    text(x = psgacc$time[show][1], y=4.5, labels = paste0("id ", id, " ", location, " wrist"), cex = 0.7, pos = 4, col="red")
+    text(x = psgacc$time[show][1], y=4.5, labels = paste0("id ", id, " non-dominant wrist"), cex = 0.7, pos = 4, col="red")
     sptwindowt0t1 = c(sptwindow$lightsout,sptwindow$lightson)
     plot(psgacc$time[show], psgacc$anglez[show], pch=20, ylim=c(-90,90), type="l", main = "",bty="l", ylab="angle (degrees)",xlab="Time",cex.lab=CL,cex.axis=CA)
     if (length(sptwindowt0t1) == 2) lines(psgacc$time[sptwindowt0t1], rep(89,2), col="blue", lwd=5, lty=1, lend=2)
