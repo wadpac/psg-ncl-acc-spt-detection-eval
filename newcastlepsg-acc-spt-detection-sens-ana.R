@@ -244,8 +244,14 @@ for (sensi in 1:31) {
         }
       }
       sleepepisodes = sdl1
+      
+      
       # Derive sleep efficiency and various other summary variables & Area under the cruve for spt window classification
       if (length(sptwindow$lightson) != 0 & length(sptwindow$lightsout) != 0) {
+        if (sptwindow$lightsout == 0) {
+          sptwindow$lightsout = 1
+        }
+        
         # Estimated sleep from the algorithm
         sleepclas = sptwindow$sleep[sptwindow$lightsout:sptwindow$lightson,1]
         output$est_sle_eff[h] = (length(which(sleepclas == 1)) / length(sleepclas)) * 100
