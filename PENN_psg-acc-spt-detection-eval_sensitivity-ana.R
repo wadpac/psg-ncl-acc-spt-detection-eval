@@ -238,9 +238,9 @@ for (sensi in 1:31) {
       psgacc_expand$Event = "Wake"
       psgacc_expand$ENMO = 0.1
       psgacc = rbind(psgacc,psgacc_expand)
-      if (lastsensi != sensi) {
-        print(paste0(sensi," ",perc," ",inbedthreshold," ",bedblocksize," ",outofbedsize))
-      }
+      # if (lastsensi != sensi) {
+      #   print(paste0(sensi," ",perc," ",inbedthreshold," ",bedblocksize," ",outofbedsize))
+      # }
       lastsensi = sensi
       # now use the expanded data for spt window detection.
       sptwindow = calculate_hdcza(psgacc$anglez, k =60, perc = perc, inbedthreshold = inbedthreshold,
@@ -399,3 +399,5 @@ for (sensi in 1:31) {
   sensi_output[sensi,1:2] = c(sensi-1,MAE*60)
   print(sensi_output[sensi,])
 }
+
+write.csv(sensi_output,file="/media/vincent/Exeter/psg_penn_sensitivity_analysis.csv",row.names = FALSE)
