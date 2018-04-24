@@ -5,11 +5,11 @@ f1 = c() #file to end with if used in serial analyses (modify accordingly, if in
 mode= c(1) #What part of the analysis needs to be done (options: 1,2,3,4 and 5)
 #======================================================
 
-datadir = "/media/windows-share/Exeter/psg_study/accdata_psg_nc"
+datadir = "/media/vincent/Exeter/psg_study/accdata_psg_nc"
 # datadir = "/media/windows-share/London/testbinaries"
-outputdir = "/media/windows-share/Exeter/psg_study"
+outputdir = "/media/vincent/Exeter/psg_study"
 studyname = "psg"
-dirR = "/home/vincent/GGIR/mcs-acc/R"
+dirR = "/home/vincent/GGIR/GGIR/R"
 loglocation = ""
 
 #=====================================================================================
