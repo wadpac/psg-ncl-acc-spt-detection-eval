@@ -18,38 +18,99 @@ sensi_output = matrix(0,31,3)
 
 for (sensi in 1:31) {
   # print(paste0("parameter configuration ",sensi-1))
-  if (sensi == 1) perc = 0.1; inbedthreshold = 15; bedblocksize = 30; outofbedsize = 60 # default configurations (keep hardcoded for now
-  if (sensi == 2) perc = 0.14; inbedthreshold=18; bedblocksize =39; outofbedsize=74  #id=1
-  if (sensi == 3) perc = 0.12; inbedthreshold=10; bedblocksize =38; outofbedsize=60  #id=2
-  if (sensi == 4) perc = 0.1; inbedthreshold=19; bedblocksize =43; outofbedsize=49  #id=3
-  if (sensi == 5) perc = 0.13; inbedthreshold=16; bedblocksize =35; outofbedsize=89  #id=4
-  if (sensi == 6) perc = 0.14; inbedthreshold=17; bedblocksize =34; outofbedsize=60  #id=5
-  if (sensi == 7) perc = 0.15; inbedthreshold=15; bedblocksize =29; outofbedsize=34  #id=6
-  if (sensi == 8) perc = 0.06; inbedthreshold=10; bedblocksize =31; outofbedsize=84  #id=7
-  if (sensi == 9) perc = 0.12; inbedthreshold=12; bedblocksize =31; outofbedsize=73  #id=8
-  if (sensi == 10) perc = 0.14; inbedthreshold=14; bedblocksize =18; outofbedsize=57  #id=9
-  if (sensi == 11) perc = 0.09; inbedthreshold=18; bedblocksize =33; outofbedsize=76  #id=10
-  if (sensi == 12) perc = 0.09; inbedthreshold=10; bedblocksize =37; outofbedsize=82  #id=11
-  if (sensi == 13) perc = 0.09; inbedthreshold=19; bedblocksize =32; outofbedsize=51  #id=12
-  if (sensi == 14) perc = 0.06; inbedthreshold=17; bedblocksize =26; outofbedsize=78  #id=13
-  if (sensi == 15) perc = 0.11; inbedthreshold=20; bedblocksize =42; outofbedsize=65  #id=14
-  if (sensi == 16) perc = 0.1; inbedthreshold=19; bedblocksize =41; outofbedsize=33  #id=15
-  if (sensi == 17) perc = 0.09; inbedthreshold=16; bedblocksize =34; outofbedsize=48  #id=16
-  if (sensi == 18) perc = 0.07; inbedthreshold=16; bedblocksize =28; outofbedsize=61  #id=17
-  if (sensi == 19) perc = 0.13; inbedthreshold=18; bedblocksize =34; outofbedsize=81  #id=18
-  if (sensi == 20) perc = 0.07; inbedthreshold=11; bedblocksize =30; outofbedsize=48  #id=19
-  if (sensi == 21) perc = 0.09; inbedthreshold=19; bedblocksize =19; outofbedsize=71  #id=20
-  if (sensi == 22) perc = 0.13; inbedthreshold=12; bedblocksize =21; outofbedsize=87  #id=21
-  if (sensi == 23) perc = 0.09; inbedthreshold=12; bedblocksize =35; outofbedsize=70  #id=22
-  if (sensi == 24) perc = 0.14; inbedthreshold=14; bedblocksize =42; outofbedsize=48  #id=23
-  if (sensi == 25) perc = 0.13; inbedthreshold=15; bedblocksize =37; outofbedsize=54  #id=24
-  if (sensi == 26) perc = 0.12; inbedthreshold=12; bedblocksize =33; outofbedsize=42  #id=25
-  if (sensi == 27) perc = 0.13; inbedthreshold=13; bedblocksize =44; outofbedsize=78  #id=26
-  if (sensi == 28) perc = 0.06; inbedthreshold=20; bedblocksize =31; outofbedsize=40  #id=27
-  if (sensi == 29) perc = 0.11; inbedthreshold=12; bedblocksize =29; outofbedsize=66  #id=28
-  if (sensi == 30) perc = 0.07; inbedthreshold=10; bedblocksize =31; outofbedsize=32  #id=29
-  if (sensi == 31) perc = 0.07; inbedthreshold=17; bedblocksize =21; outofbedsize=31  #id=30
-  
+  if (sensi == 1) {
+    perc = 0.1; inbedthreshold = 15; bedblocksize = 30; outofbedsize = 60 # default configurations (keep hardcoded for now
+  }
+  if (sensi == 2) {
+    perc = 0.14; inbedthreshold=18; bedblocksize =39; outofbedsize=74  #id=1
+  }
+  if (sensi == 3) {
+    perc = 0.12; inbedthreshold=10; bedblocksize =38; outofbedsize=60  #id=2
+  }
+  if (sensi == 4) { 
+    perc = 0.1; inbedthreshold=19; bedblocksize =43; outofbedsize=49  #id=3
+  }
+  if (sensi == 5) {
+    perc = 0.13; inbedthreshold=16; bedblocksize =35; outofbedsize=89  #id=4
+  }
+  if (sensi == 6) {
+    perc = 0.14; inbedthreshold=17; bedblocksize =34; outofbedsize=60  #id=5
+  }
+  if (sensi == 7) {
+    perc = 0.15; inbedthreshold=15; bedblocksize =29; outofbedsize=34  #id=6
+  }
+  if (sensi == 8) {
+    perc = 0.06; inbedthreshold=10; bedblocksize =31; outofbedsize=84  #id=7
+  }
+  if (sensi == 9) {
+    perc = 0.12; inbedthreshold=12; bedblocksize =31; outofbedsize=73  #id=8
+  }
+  if (sensi == 10) {
+    perc = 0.14; inbedthreshold=14; bedblocksize =18; outofbedsize=57  #id=9
+  }
+  if (sensi == 11) {
+    perc = 0.09; inbedthreshold=18; bedblocksize =33; outofbedsize=76  #id=10
+  }
+  if (sensi == 12) {
+    perc = 0.09; inbedthreshold=10; bedblocksize =37; outofbedsize=82  #id=11
+  }
+  if (sensi == 13) {
+    perc = 0.09; inbedthreshold=19; bedblocksize =32; outofbedsize=51  #id=12
+  }
+  if (sensi == 14) {
+    perc = 0.06; inbedthreshold=17; bedblocksize =26; outofbedsize=78  #id=13
+  }
+  if (sensi == 15) {
+    perc = 0.11; inbedthreshold=20; bedblocksize =42; outofbedsize=65  #id=14
+  }
+  if (sensi == 16) {
+    perc = 0.1; inbedthreshold=19; bedblocksize =41; outofbedsize=33  #id=15
+  }
+  if (sensi == 17) {
+    perc = 0.09; inbedthreshold=16; bedblocksize =34; outofbedsize=48  #id=16
+  }
+  if (sensi == 18) {
+    perc = 0.07; inbedthreshold=16; bedblocksize =28; outofbedsize=61  #id=17
+  }
+  if (sensi == 19) {
+    perc = 0.13; inbedthreshold=18; bedblocksize =34; outofbedsize=81  #id=18
+  }
+  if (sensi == 20) {
+    perc = 0.07; inbedthreshold=11; bedblocksize =30; outofbedsize=48  #id=19
+  }
+  if (sensi == 21) {
+    perc = 0.09; inbedthreshold=19; bedblocksize =19; outofbedsize=71  #id=20
+  }
+  if (sensi == 22) {
+    perc = 0.13; inbedthreshold=12; bedblocksize =21; outofbedsize=87  #id=21
+  }
+  if (sensi == 23) {
+    perc = 0.09; inbedthreshold=12; bedblocksize =35; outofbedsize=70  #id=22
+  }
+  if (sensi == 24) {
+    perc = 0.14; inbedthreshold=14; bedblocksize =42; outofbedsize=48  #id=23
+  }
+  if (sensi == 25) {
+    perc = 0.13; inbedthreshold=15; bedblocksize =37; outofbedsize=54  #id=24
+  }
+  if (sensi == 26) {
+    perc = 0.12; inbedthreshold=12; bedblocksize =33; outofbedsize=42  #id=25
+  }
+  if (sensi == 27) {
+    perc = 0.13; inbedthreshold=13; bedblocksize =44; outofbedsize=78  #id=26
+  }
+  if (sensi == 28) {
+    perc = 0.06; inbedthreshold=20; bedblocksize =31; outofbedsize=40  #id=27
+  }
+  if (sensi == 29) {
+    perc = 0.11; inbedthreshold=12; bedblocksize =29; outofbedsize=66  #id=28
+  }
+  if (sensi == 30) {
+    perc = 0.07; inbedthreshold=10; bedblocksize =31; outofbedsize=32  #id=29
+  }
+  if (sensi == 31) {
+    perc = 0.07; inbedthreshold=17; bedblocksize =21; outofbedsize=31  #id=30
+  }
   
   
   
