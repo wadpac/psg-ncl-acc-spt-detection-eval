@@ -117,7 +117,10 @@ for (location in c("left","right")) {
     psgacc_expand$ENMO = 0.1
     psgacc = rbind(psgacc,psgacc_expand)
     # now use the expanded data for spt window detection.
-    sptwindow = calculate_hdcza(psgacc$anglez, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 30, outofbedsize = 60, ws3 = 5)
+    # perc = 0.06; inbedthreshold=10; bedblocksize =31; outofbedsize=84  #id=7
+    perc = 0.1; inbedthreshold = 15; bedblocksize = 30; outofbedsize = 60
+    sptwindow = calculate_hdcza(psgacc$anglez, k =60, perc = perc, inbedthreshold = inbedthreshold,
+                                bedblocksize = bedblocksize, outofbedsize = outofbedsize, ws3 = 5)
     # detect sleep episodes within the spt window based on previously described algorithm: journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533
     postch = which(abs(diff(psgacc$anglez)) > 5) #posture change of at least j degrees
     # count posture changes that happen less than once per ten minutes
@@ -367,14 +370,23 @@ summarizer = function(x) {
           paste0(round(x$statistic,digits=2),"; ",round(x$parameter,digits=2)), as.character(round(x$p.value,digits=2)))
   return(sum)
 }
-table4 = matrix("",5,7)
-table4[1:5,1] = c("t.test onset","t.tes wake","t.test dur",
-                  "t.test sleepdur","t.test sleep eff")
+table4 = matrix("",9,7)
+table4[1:9,1] = c("t.test onset","MAE onset","t.tes wake","MAE wake","t.test dur","MAE dur",
+                  "t.test sleepdur","t.test sleep eff","MAE sleep efficiency")
 table4[1,2:7] = c(summarizet(Tonset),summarizet(TonsetR))
-table4[2,2:7] = c(summarizet(Twake),summarizet(TwakeR))
-table4[3,2:7] = c(summarizet(Tdur),summarizet(TdurR))
-table4[4,2:7] = c(summarizet(Tsleepdur),summarizet(TsleepdurR))
-table4[5,2:7] = c(summarizer(Tsleepeff),summarizer(TsleepeffR))
+table4[2,c(2,5)] = c(round(mean(output_left$error_PSTonset_abs),digits=1),
+                     round(mean(output_right$error_PSTonset_abs),digits=1)) * 60
+table4[3,2:7] = c(summarizet(Twake),summarizet(TwakeR))
+table4[4,c(2,5)] = c(round(mean(output_left$error_PSTwake_abs),digits=1),
+                     round(mean(output_right$error_PSTwake_abs),digits=1)) * 60
+table4[5,2:7] = c(summarizet(Tdur),summarizet(TdurR))
+table4[6,c(2,5)] = c(round(mean(abs(output_left$est_PSTdur - output_left$true_PSTdur)),digits=1), 
+                     round(mean(abs(output_right$est_PSTdur - output_right$true_PSTdur)),digits=1)) * 60
+table4[7,2:7] = c(summarizet(Tsleepdur),summarizet(TsleepdurR))
+table4[8,2:7] = c(summarizer(Tsleepeff),summarizer(TsleepeffR))
+table4[9,c(2,5)] = c(round(mean(abs(output_left$est_sle_eff - output_left$true_sle_eff)),digits=1), 
+                     round(mean(abs(output_right$est_sle_eff - output_right$true_sle_eff)),digits=1))
+write.csv(table4,file="/media/vincent/Exeter/table_4.csv")
 # table4[2,2:7] = c(summarizer(Conset),summarizet(ConsetR))
 # table4[4,2:7] = c(summarizer(Cwake),summarizet(CwakeR))
 # table4[6,2:7] = c(summarizer(Cdur),summarizet(CdurR))
