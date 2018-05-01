@@ -117,7 +117,7 @@ for (location in c("left","right")) {
     psgacc_expand$ENMO = 0.1
     psgacc = rbind(psgacc,psgacc_expand)
     # now use the expanded data for spt window detection.
-    # perc = 0.06; inbedthreshold=10; bedblocksize =31; outofbedsize=84  #id=7
+    # perc = 0.12; inbedthreshold=12; bedblocksize =31; outofbedsize=73  #id=8
     perc = 0.1; inbedthreshold = 15; bedblocksize = 30; outofbedsize = 60
     sptwindow = calculate_hdcza(psgacc$anglez, k =60, perc = perc, inbedthreshold = inbedthreshold,
                                 bedblocksize = bedblocksize, outofbedsize = outofbedsize, ws3 = 5)
@@ -387,15 +387,14 @@ table4[8,2:7] = c(summarizer(Tsleepeff),summarizer(TsleepeffR))
 table4[9,c(2,5)] = c(round(mean(abs(output_left$est_sle_eff - output_left$true_sle_eff)),digits=1), 
                      round(mean(abs(output_right$est_sle_eff - output_right$true_sle_eff)),digits=1))
 write.csv(table4,file="/media/vincent/Exeter/table_4.csv")
-# table4[2,2:7] = c(summarizer(Conset),summarizet(ConsetR))
-# table4[4,2:7] = c(summarizer(Cwake),summarizet(CwakeR))
-# table4[6,2:7] = c(summarizer(Cdur),summarizet(CdurR))
-# table4[8,2:7] = c(summarizer(Csleepdur),summarizet(CsleepdurR))
-# table4[10,2:7] = c(summarizer(Csleepeff),summarizet(CsleepeffR))
 
-print(summary(output_left$auc,digits=2))
-print(summary(output_left$accuracy,digits=2))
-print(summary(output_left$Sens1,digits=2))
-print(summary(output_right$auc,digits=2))
-print(summary(output_right$accuracy,digits=2))
-print(summary(output_right$Sens1,digits=2))
+print("left")
+output_left$accuracy = output_left$accuracy * 100
+print(paste0(summary(output_left$auc,digits=2)[4]," (IQR:",summary(output_left$auc,digits=2)[1],"-",summary(output_left$auc,digits=2)[5],")"))
+print(paste0(summary(output_left$accuracy,digits=2)[4]," (IQR:",summary(output_left$accuracy,digits=2)[1],"-",summary(output_left$accuracy,digits=2)[5],")"))
+print(paste0(summary(output_left$Sens1,digits=2)[4]," (IQR:",summary(output_left$Sens1,digits=2)[1],"-",summary(output_left$Sens1,digits=2)[5],")"))
+print("right")
+output_right$accuracy = output_right$accuracy * 100
+print(paste0(summary(output_right$auc,digits=2)[4]," (IQR:",summary(output_right$auc,digits=2)[1],"-",summary(output_right$auc,digits=2)[5],")"))
+print(paste0(summary(output_right$accuracy,digits=2)[4]," (IQR:",summary(output_right$accuracy,digits=2)[1],"-",summary(output_right$accuracy,digits=2)[5],")"))
+print(paste0(summary(output_right$Sens1,digits=2)[4]," (IQR:",summary(output_right$Sens1,digits=2)[1],"-",summary(output_right$Sens1,digits=2)[5],")"))
