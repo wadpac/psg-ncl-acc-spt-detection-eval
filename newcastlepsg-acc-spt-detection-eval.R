@@ -73,23 +73,6 @@ for (location in c("right")) {
     while(nrow(psgacc) == 0) {
       PSG$timenum = PSG$timenum + 2 # psg times are not rounded to 5 seconds
       psgacc = merge(PSG,ACC,by="timenum")
-      #   kkkk
-      # if (cnt == 10) {
-      #   if (PSG$timenum[1] - ACC$timenum[1] > 12*3600) {
-      #     print(paste0("timeshift backward",id))
-      #     PSG$timenum = PSG$timenum - 24*3600
-      #   } else if (PSG$timenum[1] - ACC$timenum[1] < -12*3600) {
-      #     print(paste0("timeshifted forward ",id))
-      #     PSG$timenum = PSG$timenum + 24*3600
-      #   }
-      #   cnt = 0
-      #   cnt2 = cnt2 + 1
-      #   print("stop")
-      #   jjj
-      #   PSG$time = as.POSIXlt(PSG$timenum,origin="1970-1-1",tz = "Europe/London")
-      #   if (cnt2 == 3) psgacc = 1
-      # }
-      # cnt = cnt + 1
     }
     
     # ========================================================
@@ -135,8 +118,13 @@ for (location in c("right")) {
     psgacc_expand$ENMO = 0.1
     psgacc = rbind(psgacc,psgacc_expand)
     
+    
+    # perc = 0.12; inbedthreshold=12; bedblocksize =31; outofbedsize=73  #id=8
+    perc = 0.1; inbedthreshold = 15; bedblocksize = 30; outofbedsize = 60
     # now use the expanded data for spt window detection.
-    sptwindow = calculate_hdcza(psgacc$anglez, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 30, outofbedsize = 60, ws3 = 5)
+    # sptwindow = calculate_hdcza(psgacc$anglez, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 30, outofbedsize = 60, ws3 = 5)
+    sptwindow = calculate_hdcza(psgacc$anglez, k =60, perc = perc, inbedthreshold = inbedthreshold,
+                                bedblocksize = bedblocksize, outofbedsize = outofbedsize, ws3 = 5)
     # detect sleep episodes within the spt window based on previously described algorithm: journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533
     postch = which(abs(diff(psgacc$anglez)) > 5) #posture change of at least j degrees
     # count posture changes that happen less than once per ten minutes
@@ -359,19 +347,27 @@ summarizer = function(x) {
   return(sum)
 }
 
-table5 = matrix("",10,4)
-table5[1:5,1] = c("t.test onset","t.tes wake","t.test dur","t.test sleepdur","t.test sleep eff")
-table5[6:10,1] = c("cor.test onset","cor.tes wake","cor.test dur","cor.test sleepdur","cor.test sleep eff")
+table5 = matrix("",14,4)
+table5[1:9,1] = c("t.test onset","MAE onset","t.tes wake","MAE wake","t.test dur","MAE dur","t.test sleepdur","t.test sleep eff","MAE sleep efficiency")
+table5[10:14,1] = c("cor.test onset","cor.tes wake","cor.test dur","cor.test sleepdur","cor.test sleep eff")
 table5[1,2:4] = summarizet(Tonset)
-table5[2,2:4] = summarizet(Twake)
-table5[3,2:4] = summarizet(Tdur)
-table5[4,2:4] = summarizet(Tsleepdur)
-table5[5,2:4] = summarizer(Tsleepeff)
-table5[6,2:4] = summarizer(Conset)
-table5[7,2:4] = summarizer(Cwake)
-table5[8,2:4] = summarizer(Cdur)
-table5[9,2:4] = summarizer(Csleepdur)
-table5[10,2:4] = summarizer(Csleepeff)
+table5[2,2] = round(mean(output_right$error_PSTonset_abs) * 60,digits=1)
+table5[3,2:4] = summarizet(Twake)
+table5[4,2] = round(mean(output_right$error_PSTwake_abs) * 60,digits=1)
+table5[5,2:4] = summarizet(Tdur)
+table5[6,2] = round(mean(abs(output_right$est_PSTdur - output_right$true_PSTdur)) * 60,digits=1)
+table5[7,2:4] = summarizet(Tsleepdur)
+table5[8,2:4] = summarizer(Tsleepeff)
+table5[9,2] = round(mean(abs(output_right$est_sle_eff - output_right$true_sle_eff)),digits=1)
+table5[10,2:4] = summarizer(Conset)
+table5[11,2:4] = summarizer(Cwake)
+table5[12,2:4] = summarizer(Cdur)
+table5[13,2:4] = summarizer(Csleepdur)
+table5[14,2:4] = summarizer(Csleepeff)
+
+write.csv(table5,file="/media/vincent/Exeter/table_5.csv")
+
+
 
 print(summary(output$auc,digits=2))
 print(summary(output$accuracy,digits=2))
