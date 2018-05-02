@@ -119,8 +119,8 @@ for (location in c("right")) {
     psgacc = rbind(psgacc,psgacc_expand)
     
     
-    # perc = 0.12; inbedthreshold=12; bedblocksize =31; outofbedsize=73  #id=8
-    perc = 0.1; inbedthreshold = 15; bedblocksize = 30; outofbedsize = 60
+    perc = 0.12; inbedthreshold=12; bedblocksize =31; outofbedsize=73  #id=8
+    # perc = 0.1; inbedthreshold = 15; bedblocksize = 30; outofbedsize = 60
     # now use the expanded data for spt window detection.
     # sptwindow = calculate_hdcza(psgacc$anglez, k =60, perc = 0.1, inbedthreshold = 15, bedblocksize = 30, outofbedsize = 60, ws3 = 5)
     sptwindow = calculate_hdcza(psgacc$anglez, k =60, perc = perc, inbedthreshold = inbedthreshold,
@@ -372,4 +372,11 @@ write.csv(table5,file="/media/vincent/Exeter/table_5.csv")
 print(summary(output$auc,digits=2))
 print(summary(output$accuracy,digits=2))
 print(summary(output$Sens1,digits=2))
+
+
+output_right$accuracy = output_right$accuracy * 100
+print(paste0("AUC         ",summary(output_right$auc,digits=2)[4]," (IQR:",summary(output_right$auc,digits=2)[1],"-",summary(output_right$auc,digits=2)[5],")"))
+print(paste0("Accuracy    ",summary(output_right$accuracy,digits=2)[4]," (IQR:",summary(output_right$accuracy,digits=2)[1],"-",summary(output_right$accuracy,digits=2)[5],")"))
+print(paste0("Sensitivity ",summary(output_right$Sens1,digits=2)[4]," (IQR:",summary(output_right$Sens1,digits=2)[1],"-",summary(output_right$Sens1,digits=2)[5],")"))
+
 
