@@ -117,8 +117,8 @@ for (location in c("left","right")) {
     psgacc_expand$ENMO = 0.1
     psgacc = rbind(psgacc,psgacc_expand)
     # now use the expanded data for spt window detection.
-    # perc = 0.12; inbedthreshold=12; bedblocksize =31; outofbedsize=73  #id=8
-    perc = 0.1; inbedthreshold = 15; bedblocksize = 30; outofbedsize = 60
+    perc = 0.12; inbedthreshold=12; bedblocksize =31; outofbedsize=73  #id=8
+    # perc = 0.1; inbedthreshold = 15; bedblocksize = 30; outofbedsize = 60
     sptwindow = calculate_hdcza(psgacc$anglez, k =60, perc = perc, inbedthreshold = inbedthreshold,
                                 bedblocksize = bedblocksize, outofbedsize = outofbedsize, ws3 = 5)
     # detect sleep episodes within the spt window based on previously described algorithm: journals.plos.org/plosone/article?id=10.1371/journal.pone.0142533
@@ -360,13 +360,13 @@ CsleepeffR = cor.test(output_right$est_sle_eff,output_right$true_sle_eff,paired 
 
 
 summarizet = function(x) {
-  sum = c(paste0(round(x$estimate * 60,digits=0)," (95% CI:",round(x$conf.int[1] * 60,digits=0)," - ",round(x$conf.int[2]  * 60,digits=0),")"), 
+  sum = c(paste0(round(x$estimate * 60,digits=0)," (95% CI: ",round(x$conf.int[1] * 60,digits=0)," - ",round(x$conf.int[2]  * 60,digits=0),")"), 
           paste0(round(x$statistic,digits=2),"; ",round(x$parameter,digits=2)), as.character(round(x$p.value,digits=2)))
   return(sum)
 }
 
 summarizer = function(x) {
-  sum = c(paste0(round(x$estimate,digits=2)," (95% CI:",round(x$conf.int[1],digits=2)," - ",round(x$conf.int[2],digits=2),")"), 
+  sum = c(paste0(round(x$estimate,digits=2)," (95% CI: ",round(x$conf.int[1],digits=2)," - ",round(x$conf.int[2],digits=2),")"), 
           paste0(round(x$statistic,digits=2),"; ",round(x$parameter,digits=2)), as.character(round(x$p.value,digits=2)))
   return(sum)
 }
@@ -374,27 +374,25 @@ table4 = matrix("",9,7)
 table4[1:9,1] = c("t.test onset","MAE onset","t.tes wake","MAE wake","t.test dur","MAE dur",
                   "t.test sleepdur","t.test sleep eff","MAE sleep efficiency")
 table4[1,2:7] = c(summarizet(Tonset),summarizet(TonsetR))
-table4[2,c(2,5)] = c(round(mean(output_left$error_PSTonset_abs),digits=1),
-                     round(mean(output_right$error_PSTonset_abs),digits=1)) * 60
+table4[2,c(2,5)] = c(round(mean(output_left$error_PSTonset_abs) * 60,digits=1),
+                     round(mean(output_right$error_PSTonset_abs) * 60,digits=1))
 table4[3,2:7] = c(summarizet(Twake),summarizet(TwakeR))
-table4[4,c(2,5)] = c(round(mean(output_left$error_PSTwake_abs),digits=1),
-                     round(mean(output_right$error_PSTwake_abs),digits=1)) * 60
+table4[4,c(2,5)] = c(round(mean(output_left$error_PSTwake_abs) * 60,digits=1),
+                     round(mean(output_right$error_PSTwake_abs) * 60,digits=1))
 table4[5,2:7] = c(summarizet(Tdur),summarizet(TdurR))
-table4[6,c(2,5)] = c(round(mean(abs(output_left$est_PSTdur - output_left$true_PSTdur)),digits=1), 
-                     round(mean(abs(output_right$est_PSTdur - output_right$true_PSTdur)),digits=1)) * 60
+table4[6,c(2,5)] = c(round(mean(abs(output_left$est_PSTdur - output_left$true_PSTdur)) * 60,digits=1), 
+                     round(mean(abs(output_right$est_PSTdur - output_right$true_PSTdur)) * 60,digits=1))
 table4[7,2:7] = c(summarizet(Tsleepdur),summarizet(TsleepdurR))
 table4[8,2:7] = c(summarizer(Tsleepeff),summarizer(TsleepeffR))
 table4[9,c(2,5)] = c(round(mean(abs(output_left$est_sle_eff - output_left$true_sle_eff)),digits=1), 
                      round(mean(abs(output_right$est_sle_eff - output_right$true_sle_eff)),digits=1))
 write.csv(table4,file="/media/vincent/Exeter/table_4.csv")
 
-print("left")
 output_left$accuracy = output_left$accuracy * 100
-print(paste0(summary(output_left$auc,digits=2)[4]," (IQR:",summary(output_left$auc,digits=2)[1],"-",summary(output_left$auc,digits=2)[5],")"))
-print(paste0(summary(output_left$accuracy,digits=2)[4]," (IQR:",summary(output_left$accuracy,digits=2)[1],"-",summary(output_left$accuracy,digits=2)[5],")"))
-print(paste0(summary(output_left$Sens1,digits=2)[4]," (IQR:",summary(output_left$Sens1,digits=2)[1],"-",summary(output_left$Sens1,digits=2)[5],")"))
-print("right")
 output_right$accuracy = output_right$accuracy * 100
-print(paste0(summary(output_right$auc,digits=2)[4]," (IQR:",summary(output_right$auc,digits=2)[1],"-",summary(output_right$auc,digits=2)[5],")"))
-print(paste0(summary(output_right$accuracy,digits=2)[4]," (IQR:",summary(output_right$accuracy,digits=2)[1],"-",summary(output_right$accuracy,digits=2)[5],")"))
-print(paste0(summary(output_right$Sens1,digits=2)[4]," (IQR:",summary(output_right$Sens1,digits=2)[1],"-",summary(output_right$Sens1,digits=2)[5],")"))
+print(paste0("AUC         ",summary(output_left$auc,digits=2)[4]," (IQR:",summary(output_left$auc,digits=2)[1],"-",summary(output_left$auc,digits=2)[5],")   ",
+             summary(output_right$auc,digits=2)[4]," (IQR:",summary(output_right$auc,digits=2)[1],"-",summary(output_right$auc,digits=2)[5],")"))
+print(paste0("Accuracy    ",summary(output_left$accuracy,digits=2)[4]," (IQR:",summary(output_left$accuracy,digits=2)[1],"-",summary(output_left$accuracy,digits=2)[5],")   ",
+             summary(output_right$accuracy,digits=2)[4]," (IQR:",summary(output_right$accuracy,digits=2)[1],"-",summary(output_right$accuracy,digits=2)[5],")"))
+print(paste0("Sensitivity ",summary(output_left$Sens1,digits=2)[4]," (IQR:",summary(output_left$Sens1,digits=2)[1],"-",summary(output_left$Sens1,digits=2)[5],")   ",
+             summary(output_right$Sens1,digits=2)[4]," (IQR:",summary(output_right$Sens1,digits=2)[1],"-",summary(output_right$Sens1,digits=2)[5],")"))
