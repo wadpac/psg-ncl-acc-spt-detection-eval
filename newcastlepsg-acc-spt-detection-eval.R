@@ -358,6 +358,15 @@ CdurR = cor.test(output_right$est_PSTdur,output_right$true_PSTdur,paired = TRUE)
 CsleepdurR = cor.test(output_right$est_sleepdur,output_right$true_sleepdur,paired = TRUE)
 CsleepeffR = cor.test(output_right$est_sle_eff,output_right$true_sle_eff,paired = TRUE)
 
+difference_sleepeff_right = output_right$est_sle_eff-output_right$true_sle_eff
+difference_sleepeff_left = output_left$est_sle_eff-output_left$true_sle_eff
+outlier_right = which(difference_sleepeff_left > 4*sd(difference_sleepeff_left))
+outlier_left = which(difference_sleepeff_right > 4*sd(difference_sleepeff_right))
+Tsleepeff2 = t.test(output_left$est_sle_eff[-outlier_left],output_left$true_sle_eff[-outlier_left],paired = TRUE)
+TsleepeffR2 = t.test(output_right$est_sle_eff[-outlier_right],output_right$true_sle_eff[-outlier_right],paired = TRUE)
+Csleepeff2 = cor(output_left$est_sle_eff[-outlier_left],output_left$true_sle_eff[-outlier_left])
+CsleepeffR2 = cor(output_right$est_sle_eff[-outlier_right],output_right$true_sle_eff[-outlier_right])
+
 
 summarizet = function(x) {
   sum = c(paste0(round(x$estimate * 60,digits=0)," (95% CI: ",round(x$conf.int[1] * 60,digits=0)," - ",round(x$conf.int[2]  * 60,digits=0),")"), 
