@@ -1,4 +1,4 @@
-# Code related to the evaluation of Sleep Period Time window detection algorithm in the Newcastle PSG study
+# Code related to the evaluation of Sleep Period Time window detection algorithm in the Pennsylvania PSG study
 
 ## preprocess_acc_data.R
 Use R package GGIR to pre-process the accelerometer binary files, e.g. feature extraction and autocalibration.
