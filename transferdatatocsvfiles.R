@@ -60,7 +60,7 @@ if (repropsg == TRUE) {
     }
     tmp2 = unlist(sapply(tmp,fixmidnight))
     logdata$time = as.POSIXlt(tmp2,tz="America/New_York")
-    # ignore files with psg ending before 6am or duration < 6 hours
+    # ignore files with psg ending before 3am or duration < 4 hours
     if (logdata$time[length(logdata$time)]$hour >= 3 & (nrow(logdata) / 120) > 4) {
       id = as.numeric(unlist(strsplit(unlist(strsplit(lognames[i],"WIN"))[2],"_sta"))[1])
       logdata$stagescore = 0
